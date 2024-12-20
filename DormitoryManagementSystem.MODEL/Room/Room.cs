@@ -11,6 +11,7 @@ namespace DormitoryManagementSystem.MODEL
         public Guid RoomID { get; set; }
         public int Number { get; set; }
         public int Capacity { get; set; }
+        public int CurrentCapacity { get; set; }
         public int Floor { get; set; }
         public int CurrentStudentNumber { get; set; }
 
