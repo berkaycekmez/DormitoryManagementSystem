@@ -9,6 +9,11 @@ namespace DormitoryManagementSystem.MODEL
 {
     public class Dormitory
     {
+        public Dormitory()
+        {
+            Rooms = new List<Room>();
+            Students = new List<Student>();
+        }
         public Guid DormitoryID { get; set; }
         public string DormitoryName { get; set; }
         public string DormitoryPhotoUrl { get; set; }
