@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DormitoryManagementSystem.MODEL
+{
+    public class Dormitory
+    {
+        public Guid DormitoryID { get; set; }
+        public string DormitoryName { get; set; }
+        public string Address { get; set; }
+        [Required(ErrorMessage = "Telefon numarası zorunludur.")]
+        [RegularExpression(@"^(\+90|0)?5\d{9}$", ErrorMessage = "Lütfen geçerli bir telefon numarası giriniz.")]
+        public string Phone { get; set; }
+        public int DormitoryCapacity { get; set; }
+
+        public List<Room> Rooms { get; set; }
+        public List<Student> Students { get; set; }
+    }
+}

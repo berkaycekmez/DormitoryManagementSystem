@@ -1,7 +1,12 @@
+using DormitoryManagementSystem.DAL.Context;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<MyDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("Mysql"), b => b.MigrationsAssembly("DormitoryManagementSystem.WEB")));
 
 var app = builder.Build();
 
