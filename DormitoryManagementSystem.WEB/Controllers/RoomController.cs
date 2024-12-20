@@ -1,6 +1,7 @@
 ﻿using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DormitoryManagementSystem.WEB.Controllers
 {
@@ -14,7 +15,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
         public IActionResult Index()
         {
             IEnumerable<Room> rooms = new List<Room>();
-            rooms = context.Rooms.ToList();
+            rooms = context.Rooms.Include(x=>x.Dormitory).ToList();
             return View(rooms);
         }
     }

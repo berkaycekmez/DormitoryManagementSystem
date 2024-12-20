@@ -11,7 +11,10 @@ namespace DormitoryManagementSystem.MODEL
     {
         public Dormitory()
         {
-                OccupancyRate= (DormitoryCurrentCapacity * 100) / DormitoryCapacity;
+            if (DormitoryCapacity!=0)
+            {
+                OccupancyRate = (DormitoryCurrentCapacity * 100) / DormitoryCapacity;
+            }
         }
         public Guid DormitoryID { get; set; }
         public string DormitoryName { get; set; }
