@@ -16,8 +16,6 @@ namespace DormitoryManagementSystem.MODEL
         [RegularExpression(@"^(\+90|0)?5\d{9}$", ErrorMessage = "Lütfen geçerli bir telefon numarası giriniz.")]
         public string Phone { get; set; }
         public string PhotoUrl { get; set; }
-        public DateTime CheckInDate { get; set; }
-        public DateTime? CheckOutDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
