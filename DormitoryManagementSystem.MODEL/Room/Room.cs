@@ -8,6 +8,10 @@ namespace DormitoryManagementSystem.MODEL
 {
     public class Room
     {
+        public Room()
+        {
+            Students = new List<Student>();
+        }
         public Guid RoomID { get; set; }
         public int Number { get; set; }
         public int Capacity { get; set; }
