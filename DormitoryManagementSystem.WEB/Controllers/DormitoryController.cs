@@ -1,17 +1,15 @@
-using DormitoryManagementSystem.DAL.Context;
+﻿using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL;
-using DormitoryManagementSystem.WEB.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace DormitoryManagementSystem.WEB.Controllers
 {
-    public class HomeController : Controller
+    public class DormitoryController : Controller
     {
         MyDbContext context;
-        public HomeController(MyDbContext _context)
+        public DormitoryController(MyDbContext _context)
         {
-            context= _context;
+            context = _context;
         }
         public IActionResult Index()
         {
@@ -19,6 +17,5 @@ namespace DormitoryManagementSystem.WEB.Controllers
             dormitories = context.Dormitories.ToList();
             return View(dormitories);
         }
- 
     }
 }
