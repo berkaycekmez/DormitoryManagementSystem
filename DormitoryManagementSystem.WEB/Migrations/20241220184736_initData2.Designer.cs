@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DormitoryManagementSystem.WEB.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20241220183727_initData")]
-    partial class initData
+    [Migration("20241220184736_initData2")]
+    partial class initData2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

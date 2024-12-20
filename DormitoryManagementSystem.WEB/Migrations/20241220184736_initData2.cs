@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DormitoryManagementSystem.WEB.Migrations
 {
     /// <inheritdoc />
-    public partial class initData : Migration
+    public partial class initData2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
