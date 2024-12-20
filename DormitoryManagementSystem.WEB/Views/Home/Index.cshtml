@@ -24,4 +24,115 @@
             </div>
         </div>
     </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>AI Chat Assistant</h3>
+                <span class="badge bg-primary">Powered by Gemini</span>
+            </div>
+            <div class="card-body">
+                <div class="chat-container" style="height: 400px; overflow-y: auto;">
+                    <div id="chatMessages" class="mb-3">
+                        <!-- Messages will appear here -->
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <form id="chatForm" class="d-flex gap-2">
+                        <input type="text" id="userInput" class="form-control"
+                               placeholder="Ask me anything..." required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+
+<style>
+    .chat-message {
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+    }
+
+    .user-message {
+        background-color: #e9ecef;
+        margin-left: 20%;
+    }
+
+    .ai-message {
+        background-color: #f8f9fa;
+        margin-right: 20%;
+    }
+
+    .typing-indicator {
+        padding: 0.5rem;
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+
+<script>
+    document.getElementById('chatForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = document.getElementById('userInput');
+        const message = input.value;
+        input.value = '';
+
+        // Add user message
+        addMessage(message, 'user');
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        try {
+            // Make API call to your backend that interfaces with Gemini
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+
+            // Remove typing indicator and add AI response
+            removeTypingIndicator();
+            addMessage(data.response, 'ai');
+        } catch (error) {
+            removeTypingIndicator();
+            addMessage('Sorry, I encountered an error. Please try again.', 'ai');
+        }
+    });
+
+    function addMessage(message, sender) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${sender}-message`;
+        messageDiv.textContent = message;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        const chatMessages = document.getElementById('chatMessages');
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator';
+        indicator.id = 'typingIndicator';
+        indicator.textContent = 'AI is typing...';
+        chatMessages.appendChild(indicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+</script>
