@@ -1,5 +1,6 @@
 ﻿using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,5 +19,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
             rooms = context.Rooms.Include(x=>x.Dormitory).ToList();
             return View(rooms);
         }
+
     }
 }

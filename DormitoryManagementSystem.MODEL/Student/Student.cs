@@ -12,7 +12,7 @@ namespace DormitoryManagementSystem.MODEL
         public Guid StudentId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        [Required(ErrorMessage = "Telefon numarası zorunludur.")]
+
         [RegularExpression(@"^(\+90|0)?5\d{9}$", ErrorMessage = "Lütfen geçerli bir telefon numarası giriniz.")]
         public string Phone { get; set; }
         public string PhotoUrl { get; set; }

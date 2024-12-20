@@ -9,24 +9,16 @@ namespace DormitoryManagementSystem.MODEL
 {
     public class Dormitory
     {
-        public Dormitory()
-        {
-            if (DormitoryCapacity!=0)
-            {
-                OccupancyRate = (DormitoryCurrentCapacity * 100) / DormitoryCapacity;
-            }
-        }
         public Guid DormitoryID { get; set; }
         public string DormitoryName { get; set; }
         public string DormitoryPhotoUrl { get; set; }
         public string Address { get; set; }
-        [Required(ErrorMessage = "Telefon numarası zorunludur.")]
         [RegularExpression(@"^(\+90|0)?5\d{9}$", ErrorMessage = "Lütfen geçerli bir telefon numarası giriniz.")]
         public string Phone { get; set; }
         public int DormitoryCapacity { get; set; }
         public int DormitoryCurrentCapacity { get; set; }
-
         public double OccupancyRate { get; set; }
+
         public List<Room> Rooms { get; set; }
         public List<Student> Students { get; set; }
     }
