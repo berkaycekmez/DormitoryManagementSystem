@@ -1,4 +1,4 @@
-using DormitoryManagementSystem.DAL.Context;
+﻿using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL;
 using DormitoryManagementSystem.WEB.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +11,10 @@ namespace DormitoryManagementSystem.WEB.Controllers
     {
         public MyDbContext context;
 
-        // GoogleAI servisini �imdilik kald�r�yoruz ��nk� Identity sistemini kurmak �nceli�imiz
+        // GoogleAI servisini �imdilik kald�r�yoruz ��nk� Identity sistemini kurmak �nceli�imiz
         // private readonly GoogleAI _googleAI;
 
-        // Constructor'� g�ncelliyoruz
+        // Constructor'� g�ncelliyoruz
         public HomeController(MyDbContext _context/*, GoogleAI googleAI*/)
         {
             context = _context;
@@ -24,18 +24,22 @@ namespace DormitoryManagementSystem.WEB.Controllers
         public IActionResult Index()
         {
             IEnumerable<Dormitory> dormitories = new List<Dormitory>();
-            dormitories = context.Dormitories.ToList();
+            dormitories = context.Dormitories.Where(x=>x.statusDeletedDormitory==false).ToList();
+            foreach (var item in dormitories)
+            {
+                item.OccupancyRate = item.DormitoryCurrentCapacity*100/item.DormitoryCapacity;
+            }
             return View(dormitories);
         }
 
-        // AI chat fonksiyonunu �imdilik yoruma al�yoruz
+        // AI chat fonksiyonunu �imdilik yoruma al�yoruz
         /*
         [HttpPost]
         public async Task<IActionResult> Index([FromForm] MessageRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.UserMessage))
             {
-                return Json(new { response = "Mesaj bo� olamaz." });
+                return Json(new { response = "Mesaj boþ olamaz." });
             }
 
             var dormitories = context.Dormitories.ToList();
@@ -43,21 +47,41 @@ namespace DormitoryManagementSystem.WEB.Controllers
             var rooms = context.Rooms.Include(x => x.Dormitory).ToList();
 
             string dormitoryInfo = string.Join("; ", dormitories.Select(d =>
-                $"Yurt �smi: {d.DormitoryName}, Adres: {d.Address}, Id: {d.DormitoryID}, Telefon: {d.Phone}, Kapasite: {d.DormitoryCapacity}, Mevcut Kapasite: {d.DormitoryCurrentCapacity}, Doluluk Oran�: {d.OccupancyRate}%"));
+                $"Yurt Ýsmi: {d.DormitoryName}, Adres: {d.Address}, Id: {d.DormitoryID}, Telefon: {d.Phone}, Kapasite: {d.DormitoryCapacity}, Mevcut Kapasite: {d.DormitoryCurrentCapacity}, Doluluk Oraný: {d.OccupancyRate}%"));
 
             string roomInfo = string.Join("; ", rooms.Select(r =>
-                $"Oda No: {r.Number}, Kat: {r.Floor}, Id: {r.RoomID}, Kapasite: {r.Capacity}, Mevcut ��renci Say�s�: {r.CurrentStudentNumber}, Yurt: {r.Dormitory.DormitoryName}"));
+                $"Oda No: {r.Number}, Kat: {r.Floor}, Id: {r.RoomID}, Kapasite: {r.Capacity}, Mevcut Öðrenci Sayýsý: {r.CurrentStudentNumber}, Yurt: {r.Dormitory.DormitoryName}"));
 
             string studentInfo = string.Join("; ", students.Select(s =>
-                $"��renci �smi: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
+                $"Öðrenci Ýsmi: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
 
-            // AI prompt ve i�lemleri...
+            request.UserMessage += $": NOT! Sen bir yapay zeka asistanısın ve yalnızca veritabanındaki verilere dayanarak cevap vermekle yükümlüsün. Ancak, verilen soruları tekrar etme; direkt cevap ver. Şimdi sana veritabanındaki verileri veriyorum. Bilgileri dikkate alarak soruları yanıtla: " +
+$"Yurt bilgileri: {dormitoryInfo}. " +
+$"Yurtların odaları hakkındaki bilgiler: {roomInfo}. " +
+$"Ve son olarak yurtların odalarında kalan öğrencilerin bilgileri: {studentInfo}. " +
+$"Kullanıcıların istediği bilgilere bu verilerden ulaşabiliyorsan düzgün bir şekilde açıklayarak anlat." +
+$"Sana öğrenciler,yurtlar,odalar ve bunların ekleme,silme,güncelleme işlemleri ile ilgili sorulan ve söylenen her şey sistemle ilgili.Hepsine sistemden ve buprojeden bir cevap bulup yanıtlandırmak ve veri döndürmek zorundasın!" +
+$"Eğer silmek istediği şey verdiğim verilerde mevcut ise o verinin sadece ve sadece id'sini response olarak dön ama response'da sadece id'si yazsın."+
+$"ÖNCELİKLE UNUTMA, SENİN BİRİNCİ VAZİFEN ORTADA DELETE İŞLEMİ YOKSA HİÇBİR VERİNİN ID'SİNİ KİMLİĞİNİ RESPONSE OLARAK VERME. Ama delete varsa sadece id vereceksin." +
+$"AYRICA ASLA NULL RESPONSE DÖNME; HEP BİR CEVABIN OLSUN, EN KÖTÜ BİLMİYORSAN DA \"Bilmiyorum\" de. " +
+$"Eğer ki kullanıcı senden delete - silme işlemi isterse, örneğin 'Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öğrenciyi sil' 'Ömer isimli öğrenciyi sil' derse veya '1. kat 1. odayı sil' derse ya da 'şu isimli yurdu sil' derse, lütfen önce veritabanındaki verilere bak ve eşleşen veri olup olmadığını kontrol et. " +
+$"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktadır.\" şeklinde yanıt ver. ";
+
+<<<<<<< HEAD
+            // AI prompt ve i�lemleri...
             
+=======
+
+>>>>>>> 3b7a42fb66720c4b45f7a170683f7bfd040df4bc
             var model = _googleAI.GenerativeModel(Model.GeminiPro);
             var response = await model.GenerateContent(request.UserMessage);
 
             string responseText = FormatResponse(response.Text);
 
+<<<<<<< HEAD
+=======
+             
+>>>>>>> 3b7a42fb66720c4b45f7a170683f7bfd040df4bc
             if (!Guid.TryParse(response.Text, out Guid id))
             {
                 return Json(new { response = responseText });
@@ -69,28 +93,31 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             if (studentIds.Contains(id))
             {
-                Student student = context.Students.FirstOrDefault(x => x.StudentId == id);   
-                context.Students.Remove(student);
+                Student student = context.Students.FirstOrDefault(x => x.StudentId == id);
+                student.statusDeletedStudent = true;
+                context.Update(student);
                 context.SaveChanges();
-                return Json(new { response = $"�stemi� oldu�unuz silme iste�i ba�ar�yla ger�ekle�tirilmi�tir." });
+                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
             }
             else if (roomIds.Contains(id))
             {
                 Room room = context.Rooms.FirstOrDefault(x => x.RoomID == id);
-                context.Rooms.Remove(room);
+                room.statusDeletedRoom = true;
+                context.Update(room);
                 context.SaveChanges();
-                return Json(new { response = $"�stemi� oldu�unuz silme iste�i ba�ar�yla ger�ekle�tirilmi�tir." });
+                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
             }
             else if (dormitoryIds.Contains(id))
             {
                 Dormitory dormitory = context.Dormitories.FirstOrDefault(x => x.DormitoryID == id);
-                context.Dormitories.Remove(dormitory);
+                dormitory.statusDeletedDormitory = true;
+                context.Update(dormitory);
                 context.SaveChanges();
-                return Json(new { response = $"�stemi� oldu�unuz silme iste�i ba�ar�yla ger�ekle�tirilmi�tir." });
+                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
             }
             else
             {
-                return Json(new { response = "Ge�ersiz ID: Bu ID sistemde bulunmamaktad�r." });
+                return Json(new { response = "Geçersiz ID: Bu ID sistemde bulunmamaktadýr." });
             }
         }
 
@@ -108,7 +135,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
         */
     }
 
-    // Bu s�n�f� �imdilik yoruma alabiliriz ��nk� AI �zelli�ini ge�ici olarak kald�rd�k
+    // Bu s�n�f� �imdilik yoruma alabiliriz ��nk� AI �zelli�ini ge�ici olarak kald�rd�k
     /*
     public class MessageRequest
     {
