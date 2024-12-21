@@ -1,4 +1,4 @@
-using DormitoryManagementSystem.DAL.Context;
+ï»¿using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL;
 using DormitoryManagementSystem.WEB.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,11 @@ namespace DormitoryManagementSystem.WEB.Controllers
         public IActionResult Index()
         {
             IEnumerable<Dormitory> dormitories = new List<Dormitory>();
-            dormitories = context.Dormitories.ToList();
+            dormitories = context.Dormitories.Where(x=>x.statusDeletedDormitory==false).ToList();
+            foreach (var item in dormitories)
+            {
+                item.OccupancyRate = item.DormitoryCurrentCapacity*100/item.DormitoryCapacity;
+            }
             return View(dormitories);
         }
 
@@ -32,7 +36,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             if (string.IsNullOrWhiteSpace(request.UserMessage))
             {
-                return Json(new { response = "Mesaj boş olamaz." });
+                return Json(new { response = "Mesaj boÃ¾ olamaz." });
             }
 
             var dormitories = context.Dormitories.ToList();
@@ -40,26 +44,26 @@ namespace DormitoryManagementSystem.WEB.Controllers
             var rooms = context.Rooms.Include(x => x.Dormitory).ToList();
 
             string dormitoryInfo = string.Join("; ", dormitories.Select(d =>
-                $"Yurt İsmi: {d.DormitoryName}, Adres: {d.Address}, Id: {d.DormitoryID}, Telefon: {d.Phone}, Kapasite: {d.DormitoryCapacity}, Mevcut Kapasite: {d.DormitoryCurrentCapacity}, Doluluk Oranı: {d.OccupancyRate}%"));
+                $"Yurt Ãsmi: {d.DormitoryName}, Adres: {d.Address}, Id: {d.DormitoryID}, Telefon: {d.Phone}, Kapasite: {d.DormitoryCapacity}, Mevcut Kapasite: {d.DormitoryCurrentCapacity}, Doluluk OranÃ½: {d.OccupancyRate}%"));
 
             string roomInfo = string.Join("; ", rooms.Select(r =>
-                $"Oda No: {r.Number}, Kat: {r.Floor}, Id: {r.RoomID}, Kapasite: {r.Capacity}, Mevcut Öğrenci Sayısı: {r.CurrentStudentNumber}, Yurt: {r.Dormitory.DormitoryName}"));
+                $"Oda No: {r.Number}, Kat: {r.Floor}, Id: {r.RoomID}, Kapasite: {r.Capacity}, Mevcut Ã–Ã°renci SayÃ½sÃ½: {r.CurrentStudentNumber}, Yurt: {r.Dormitory.DormitoryName}"));
 
             string studentInfo = string.Join("; ", students.Select(s =>
-                $"Öğrenci İsmi: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
+                $"Ã–Ã°renci Ãsmi: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
 
-            request.UserMessage += $": NOT! Sen bir yapay zeka asistanısın ve yalnızca veritabanındaki verilere dayanarak cevap vermekle yükümlüsün. Ancak, verilen soruları tekrar etme; direkt cevap ver. Şimdi sana veritabanındaki verileri veriyorum. Bilgileri dikkate alarak soruları yanıtla: " +
-    $"Yurt bilgileri: {dormitoryInfo}. " +
-    $"Yurtların odaları hakkındaki bilgiler: {roomInfo}. " +
-    $"Eğer gelen soru çok genel veya tanıdık bir selamlaşma gibi ise, kibarca \"Bu konuda yardımcı olamam; yalnızca sistemdeki yurtlar, odalar ve öğrencilerle ilgili soruları yanıtlayabilirim.\" şeklinde yanıt ver."+
-    $"Ve son olarak yurtların odalarında kalan öğrencilerin bilgileri: {studentInfo}. " +
-    $"Kullanıcıların istediği bilgilere bu verilerden ulaşabiliyorsan düzgün bir şekilde açıklayarak anlat"+
-    $"ÖNCELİKLE UNUTMA, SENİN BİRİNCİ VAZİFEN ORTADA DELETE İŞLEMİ YOKSA HİÇBİR VERİNİN ID'SİNİ KİMLİĞİNİ RESPONSE OLARAK VERME. ama delete varsa sadece id vereceksin " +
-    $"AYRICA ASLA NULL RESPONSE DÖNME; HEP BİR CEVABIN OLSUN, EN KÖTÜ BİLMİYORSAN DA \"Bilmiyorum\" de. " +
-    $"Eğer ki kullanıcı senden delete - silme işlemi isterse, örneğin 'Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öğrenciyi sil' 'Ömer isimli öğrenciyi sil' derse veya '1. kat 1. odayı sil' derse ya da 'şu isimli yurdu sil' derse, lütfen önce veritabanındaki verilere bak ve eşleşen veri olup olmadığını kontrol et. " +
-    $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktadır.\" şeklinde yanıt ver. " +
-    $"Eğer silmek istediği şey verdiğim verilerde mevcut ise idsini response olarak dön ama response da sadece id si yazsın"+
-    $"Eğer gelen soru çok genel veya tanıdık bir selamlaşma gibi ise, kibarca \"Bu konuda yardımcı olamam; yalnızca sistemdeki yurtlar, odalar ve öğrencilerle ilgili soruları yanıtlayabilirim.\" şeklinde yanıt ver.";
+            request.UserMessage += $": NOT! Sen bir yapay zeka asistanÄ±sÄ±n ve yalnÄ±zca veritabanÄ±ndaki verilere dayanarak cevap vermekle yÃ¼kÃ¼mlÃ¼sÃ¼n. Ancak, verilen sorularÄ± tekrar etme; direkt cevap ver. Åimdi sana veritabanÄ±ndaki verileri veriyorum. Bilgileri dikkate alarak sorularÄ± yanÄ±tla: " +
+$"Yurt bilgileri: {dormitoryInfo}. " +
+$"YurtlarÄ±n odalarÄ± hakkÄ±ndaki bilgiler: {roomInfo}. " +
+$"Ve son olarak yurtlarÄ±n odalarÄ±nda kalan Ã¶ÄŸrencilerin bilgileri: {studentInfo}. " +
+$"KullanÄ±cÄ±larÄ±n istediÄŸi bilgilere bu verilerden ulaÅŸabiliyorsan dÃ¼zgÃ¼n bir ÅŸekilde aÃ§Ä±klayarak anlat." +
+$"Sana Ã¶ÄŸrenciler,yurtlar,odalar ve bunlarÄ±n ekleme,silme,gÃ¼ncelleme iÅŸlemleri ile ilgili sorulan ve sÃ¶ylenen her ÅŸey sistemle ilgili.Hepsine sistemden ve buprojeden bir cevap bulup yanÄ±tlandÄ±rmak ve veri dÃ¶ndÃ¼rmek zorundasÄ±n!" +
+$"EÄŸer silmek istediÄŸi ÅŸey verdiÄŸim verilerde mevcut ise o verinin sadece ve sadece id'sini response olarak dÃ¶n ama response'da sadece id'si yazsÄ±n."+
+$"Ã–NCELÄ°KLE UNUTMA, SENÄ°N BÄ°RÄ°NCÄ° VAZÄ°FEN ORTADA DELETE Ä°ÅLEMÄ° YOKSA HÄ°Ã‡BÄ°R VERÄ°NÄ°N ID'SÄ°NÄ° KÄ°MLÄ°ÄÄ°NÄ° RESPONSE OLARAK VERME. Ama delete varsa sadece id vereceksin." +
+$"AYRICA ASLA NULL RESPONSE DÃ–NME; HEP BÄ°R CEVABIN OLSUN, EN KÃ–TÃœ BÄ°LMÄ°YORSAN DA \"Bilmiyorum\" de. " +
+$"EÄŸer ki kullanÄ±cÄ± senden delete - silme iÅŸlemi isterse, Ã¶rneÄŸin 'Berkay Ã‡ekmez olan Muhammed Fatih SafitÃ¼rk yurdundaki Ã¶ÄŸrenciyi sil' 'Ã–mer isimli Ã¶ÄŸrenciyi sil' derse veya '1. kat 1. odayÄ± sil' derse ya da 'ÅŸu isimli yurdu sil' derse, lÃ¼tfen Ã¶nce veritabanÄ±ndaki verilere bak ve eÅŸleÅŸen veri olup olmadÄ±ÄŸÄ±nÄ± kontrol et. " +
+$"EÄŸer eÅŸleÅŸen veri yoksa, \"Silmek istediÄŸiniz veri sistemde bulunmamaktadÄ±r.\" ÅŸeklinde yanÄ±t ver. ";
+
 
             var model = _googleAI.GenerativeModel(Model.GeminiPro);
             var response = await model.GenerateContent(request.UserMessage);
@@ -78,28 +82,31 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             if (studentIds.Contains(id))
             {
-                Student student = context.Students.FirstOrDefault(x => x.StudentId == id);   
-                context.Students.Remove(student);
+                Student student = context.Students.FirstOrDefault(x => x.StudentId == id);
+                student.statusDeletedStudent = true;
+                context.Update(student);
                 context.SaveChanges();
-                return Json(new { response = $"İstemiş olduğunuz silme isteği başarıyla gerçekleştirilmiştir." });
+                return Json(new { response = $"ÃstemiÃ¾ olduÃ°unuz silme isteÃ°i baÃ¾arÃ½yla gerÃ§ekleÃ¾tirilmiÃ¾tir." });
             }
             else if (roomIds.Contains(id))
             {
                 Room room = context.Rooms.FirstOrDefault(x => x.RoomID == id);
-                context.Rooms.Remove(room);
+                room.statusDeletedRoom = true;
+                context.Update(room);
                 context.SaveChanges();
-                return Json(new { response = $"İstemiş olduğunuz silme isteği başarıyla gerçekleştirilmiştir." });
+                return Json(new { response = $"ÃstemiÃ¾ olduÃ°unuz silme isteÃ°i baÃ¾arÃ½yla gerÃ§ekleÃ¾tirilmiÃ¾tir." });
             }
             else if (dormitoryIds.Contains(id))
             {
                 Dormitory dormitory = context.Dormitories.FirstOrDefault(x => x.DormitoryID == id);
-                context.Dormitories.Remove(dormitory);
+                dormitory.statusDeletedDormitory = true;
+                context.Update(dormitory);
                 context.SaveChanges();
-                return Json(new { response = $"İstemiş olduğunuz silme isteği başarıyla gerçekleştirilmiştir." });
+                return Json(new { response = $"ÃstemiÃ¾ olduÃ°unuz silme isteÃ°i baÃ¾arÃ½yla gerÃ§ekleÃ¾tirilmiÃ¾tir." });
             }
             else
             {
-                return Json(new { response = "Geçersiz ID: Bu ID sistemde bulunmamaktadır." });
+                return Json(new { response = "GeÃ§ersiz ID: Bu ID sistemde bulunmamaktadÃ½r." });
             }
         }
         private string FormatResponse(string? responseText)
