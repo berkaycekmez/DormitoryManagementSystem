@@ -51,20 +51,22 @@ namespace DormitoryManagementSystem.WEB.Controllers
             request.UserMessage += $": NOT! Sen bir yapay zeka asistanýsýn ve yalnýzca veritabanýndaki verilere dayanarak cevap vermekle yükümlüsün. Ancak, verilen sorularý tekrar etme; direkt cevap ver. Þimdi sana veritabanýndaki verileri veriyorum. Bilgileri dikkate alarak sorularý yanýtla: " +
     $"Yurt bilgileri: {dormitoryInfo}. " +
     $"Yurtlarýn odalarý hakkýndaki bilgiler: {roomInfo}. " +
+    $"Eðer gelen soru çok genel veya tanýdýk bir selamlaþma gibi ise, kibarca \"Bu konuda yardýmcý olamam; yalnýzca sistemdeki yurtlar, odalar ve öðrencilerle ilgili sorularý yanýtlayabilirim.\" þeklinde yanýt ver."+
     $"Ve son olarak yurtlarýn odalarýnda kalan öðrencilerin bilgileri: {studentInfo}. " +
     $"Kullanýcýlarýn istediði bilgilere bu verilerden ulaþabiliyorsan düzgün bir þekilde açýklayarak anlat"+
-    $"ÖNCELÝKLE UNUTMA, SENÝN BÝRÝNCÝ VAZÝFEN UPDATE VEYA DELETE ÝÞLEMÝ YOKSA, HÝÇBÝR VERÝNÝN ID'SÝNÝ KÝMLÝÐÝNÝ RESPONSE OLARAK VERME. " +
+    $"ÖNCELÝKLE UNUTMA, SENÝN BÝRÝNCÝ VAZÝFEN ORTADA DELETE ÝÞLEMÝ YOKSA HÝÇBÝR VERÝNÝN ID'SÝNÝ KÝMLÝÐÝNÝ RESPONSE OLARAK VERME. ama delete varsa sadece id vereceksin " +
     $"AYRICA ASLA NULL RESPONSE DÖNME; HEP BÝR CEVABIN OLSUN, EN KÖTÜ BÝLMÝYORSAN DA \"Bilmiyorum\" de. " +
     $"Eðer ki kullanýcý senden delete - silme iþlemi isterse, örneðin 'Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öðrenciyi sil' 'Ömer isimli öðrenciyi sil' derse veya '1. kat 1. odayý sil' derse ya da 'þu isimli yurdu sil' derse, lütfen önce veritabanýndaki verilere bak ve eþleþen veri olup olmadýðýný kontrol et. " +
     $"Eðer eþleþen veri yoksa, \"Silmek istediðiniz veri sistemde bulunmamaktadýr.\" þeklinde yanýt ver. " +
-    $"Eðer silmek istediði þey verdiðim verilerde mevcut ise idsini response olarak dön ama response da sadece id si yazsýn";
+    $"Eðer silmek istediði þey verdiðim verilerde mevcut ise idsini response olarak dön ama response da sadece id si yazsýn"+
+    $"Eðer gelen soru çok genel veya tanýdýk bir selamlaþma gibi ise, kibarca \"Bu konuda yardýmcý olamam; yalnýzca sistemdeki yurtlar, odalar ve öðrencilerle ilgili sorularý yanýtlayabilirim.\" þeklinde yanýt ver.";
 
             var model = _googleAI.GenerativeModel(Model.GeminiPro);
             var response = await model.GenerateContent(request.UserMessage);
 
             string responseText = FormatResponse(response.Text);
 
-
+             
             if (!Guid.TryParse(response.Text, out Guid id))
             {
                 return Json(new { response = responseText });
