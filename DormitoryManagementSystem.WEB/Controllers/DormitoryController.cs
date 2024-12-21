@@ -15,12 +15,13 @@ namespace DormitoryManagementSystem.WEB.Controllers
         public IActionResult Index()
         {
             IEnumerable<Dormitory> dormitories = context.Dormitories
-            .Include(y => y.Rooms)
-            .Where(d => !d.statusDeletedDormitory)
-            .ToList();
+                .Include(y => y.Rooms)
+                .Where(d => !d.statusDeletedDormitory) // Sadece silinmemiş yurtları al
+                .ToList();
 
             return View(dormitories);
         }
+
 
         public IActionResult Create()
         {
@@ -83,16 +84,30 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             var dormitory = await context.Dormitories
                 .Include(d => d.Rooms)
+                .ThenInclude(r => r.Students) // Odalarla ilişkili öğrencileri de dahil et
                 .FirstOrDefaultAsync(d => d.DormitoryID == id); // FirstOrDefaultAsync kullanımı
 
             if (dormitory != null)
             {
+                // Yurt verisini silindi olarak işaretle
                 dormitory.statusDeletedDormitory = true;
+
+                // Odalarla ilişkili öğrencileri de güncelle
+                foreach (var room in dormitory.Rooms)
+                {
+                    room.statusDeletedRoom = true; // Oda statüsünü 1 yapıyoruz
+                    foreach (var student in room.Students)
+                    {
+                        student.statusDeletedStudent = true; // Öğrencinin durumunu 1 yapıyoruz
+                    }
+                }
+
                 await context.SaveChangesAsync();
             }
 
             return RedirectToAction("Index");
         }
+
 
 
         [HttpGet]
