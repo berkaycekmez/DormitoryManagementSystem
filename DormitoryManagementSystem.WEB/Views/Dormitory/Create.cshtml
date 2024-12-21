@@ -31,6 +31,12 @@
                         <input asp-for="DormitoryCapacity" class="form-control" type="number" min="1" required />
                         <span asp-validation-for="DormitoryCapacity" class="text-danger"></span>
                     </div>
+                    <div class="form-group mb-3">
+                        <label for="RoomCount" class="control-label">Oda Sayısı</label>
+                        <input id="RoomCount" name="RoomCount" class="form-control" type="number" min="1" required />
+                        <span class="text-danger"></span>
+                    </div>
+
 
                     <div class="form-group mb-3">
                         <label asp-for="DormitoryPhotoUrl" class="control-label">Fotoğraf URL</label>
