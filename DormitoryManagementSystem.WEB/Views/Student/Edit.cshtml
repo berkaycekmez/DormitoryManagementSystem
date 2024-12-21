@@ -1,0 +1,138 @@
+﻿@model Student
+
+<div class="card">
+    <div class="card-header">
+        <h3>Öğrenci Düzenle</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="StudentId" />
+            <input type="hidden" asp-for="CreatedAt" />
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="FirstName">Ad</label>
+                        <input asp-for="FirstName" class="form-control" value="@Model.FirstName" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="LastName">Soyad</label>
+                        <input asp-for="LastName" class="form-control" value="@Model.LastName" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="Phone">Telefon</label>
+                        <input asp-for="Phone" class="form-control" value="@Model.Phone" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="PhotoUrl">Fotoğraf URL</label>
+                        <input asp-for="PhotoUrl" class="form-control" value="@Model.PhotoUrl" />
+                        <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="DormitoryId">Yurt</label>
+                        <select asp-for="DormitoryId" class="form-control" id="dormitorySelect">
+                            <option value="">-- Yurt Seçin --</option>
+                            @foreach (var dormitory in ViewBag.Dormitories)
+                            {
+                                <option value="@dormitory.DormitoryID" selected="@(dormitory.DormitoryID == Model.DormitoryId)">
+                                    @dormitory.DormitoryName
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="DormitoryId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="RoomId">Oda</label>
+                        <select asp-for="RoomId" class="form-control" id="roomSelect">
+                            <option value="">-- Önce Yurt Seçin --</option>
+                            @if (ViewBag.Rooms != null)
+                            {
+                                @foreach (var room in ViewBag.Rooms)
+                                {
+                                    <option value="@room.RoomID" selected="@(room.RoomID == Model.RoomId)">
+                                        Oda @room.Number (@room.CurrentCapacity/@room.Capacity)
+                                    </option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="RoomId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-action="Index" class="btn btn-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            var dormitorySelect = $('#dormitorySelect');
+            var roomSelect = $('#roomSelect');
+
+            console.log('Initial DormitoryId:', '@Model.DormitoryId');
+            console.log('Initial RoomId:', '@Model.RoomId');
+
+            dormitorySelect.change(function () {
+                var dormitoryId = $(this).val();
+                console.log('Selected DormitoryId:', dormitoryId);
+
+                roomSelect.empty().append('<option value="">-- Oda Seçin --</option>');
+
+                if (dormitoryId) {
+                    $.ajax({
+                        url: `/Student/GetAvailableRooms/${dormitoryId}`,
+                        method: 'GET',
+                        success: function (data) {
+                            console.log('Received rooms:', data);
+                            if (data && data.length > 0) {
+                                data.forEach(function (room) {
+                                    roomSelect.append($('<option></option>')
+                                        .attr('value', room.roomID)
+                                        .text(`Oda ${room.number} (${room.currentCapacity}/${room.capacity})`));
+                                });
+                                roomSelect.prop('disabled', false);
+                            } else {
+                                roomSelect.append('<option value="">Bu yurtta uygun oda bulunmamaktadır</option>');
+                            }
+                        },
+                        error: function (error) {
+                            console.error('Error loading rooms:', error);
+                            roomSelect.append('<option value="">Odalar yüklenirken hata oluştu</option>');
+                        }
+                    });
+                } else {
+                    roomSelect.prop('disabled', true);
+                }
+            });
+        });
+    </script>
+}

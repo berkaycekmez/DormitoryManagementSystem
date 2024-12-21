@@ -92,6 +92,88 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
 
 
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var room = await context.Rooms
+                .Include(r => r.Dormitory)
+                .Include(r => r.Students)
+                .FirstOrDefaultAsync(r => r.RoomID == id);
 
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Dormitories = new SelectList(context.Dormitories.Where(d => !d.statusDeletedDormitory),
+                "DormitoryID", "DormitoryName", room.DormitoryID);
+
+            return View(room);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid id, Room room)
+        {
+            if (id != room.RoomID)
+            {
+                return NotFound();
+            }
+
+            var existingRoom = await context.Rooms
+                .Include(r => r.Students)
+                .FirstOrDefaultAsync(r => r.RoomID == id);
+
+            if (existingRoom == null)
+            {
+                return NotFound();
+            }
+
+            // Kapasite kontrolü
+            if (room.Capacity < existingRoom.CurrentCapacity)
+            {
+                ModelState.AddModelError("Capacity",
+                    $"Kapasite mevcut öğrenci sayısından ({existingRoom.CurrentCapacity}) az olamaz!");
+                ViewBag.Dormitories = new SelectList(context.Dormitories.Where(d => !d.statusDeletedDormitory),
+                    "DormitoryID", "DormitoryName", room.DormitoryID);
+                return View(room);
+            }
+
+            try
+            {
+                // Mevcut değerleri koru
+                room.CurrentCapacity = existingRoom.CurrentCapacity;
+                room.CurrentStudentNumber = existingRoom.CurrentStudentNumber;
+
+                // Yurt değişikliği varsa kontrol et
+                if (existingRoom.DormitoryID != room.DormitoryID)
+                {
+                    var newDormitory = await context.Dormitories
+                        .FirstOrDefaultAsync(d => d.DormitoryID == room.DormitoryID);
+
+                    if (newDormitory == null)
+                    {
+                        ModelState.AddModelError("DormitoryID", "Seçilen yurt bulunamadı.");
+                        ViewBag.Dormitories = new SelectList(context.Dormitories.Where(d => !d.statusDeletedDormitory),
+                            "DormitoryID", "DormitoryName", room.DormitoryID);
+                        return View(room);
+                    }
+                }
+
+                context.Entry(existingRoom).CurrentValues.SetValues(room);
+                await context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await context.Rooms.AnyAsync(r => r.RoomID == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
     }
 }

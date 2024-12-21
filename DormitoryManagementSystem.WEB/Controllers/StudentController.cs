@@ -180,93 +180,145 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
 
 
-        
 
 
+
+        [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
             var student = await _context.Students
                 .Include(s => s.Room)
-                .FirstOrDefaultAsync(s => s.StudentId == id);
+                .ThenInclude(r => r.Dormitory)
+                .FirstOrDefaultAsync(s => s.StudentId == id && !s.statusDeletedStudent);
 
             if (student == null)
             {
                 return NotFound();
             }
 
-            ViewBag.Dormitories = await _context.Dormitories.ToListAsync();
+            // Sadece aktif yurtları getir
+            ViewBag.Dormitories = await _context.Dormitories
+                .Where(d => !d.statusDeletedDormitory)
+                .ToListAsync();
+
+            // Seçili yurdun aktif odaları
             ViewBag.Rooms = await _context.Rooms
-                .Where(r => r.DormitoryID == student.DormitoryId)
+                .Where(r => r.DormitoryID == student.DormitoryId && !r.statusDeletedRoom)
                 .ToListAsync();
 
             return View(student);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Student student)
         {
+            // ID kontrolü
             if (id != student.StudentId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
                 using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
-                    try
-                    {
-                        var oldStudent = await _context.Students
-                            .Include(s => s.Room)
-                            .FirstOrDefaultAsync(s => s.StudentId == id);
+                    var oldStudent = await _context.Students
+                        .Include(s => s.Room)
+                        .ThenInclude(r => r.Dormitory)
+                        .FirstOrDefaultAsync(s => s.StudentId == id);
 
-                        if (oldStudent == null)
+                    if (oldStudent == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Önceki değerleri koruyalım
+                    student.CreatedAt = oldStudent.CreatedAt;
+                    student.UpdatedAt = DateTime.Now;
+
+                    if (oldStudent.RoomId != student.RoomId)
+                    {
+                        // Eski oda bilgileri
+                        var oldRoom = await _context.Rooms
+                            .Include(r => r.Dormitory)
+                            .FirstOrDefaultAsync(r => r.RoomID == oldStudent.RoomId);
+
+                        if (oldRoom != null)
                         {
-                            return NotFound();
+                            oldRoom.CurrentCapacity--;
+                            oldRoom.CurrentStudentNumber--;
+                            oldRoom.Dormitory.DormitoryCurrentCapacity--;
+                            _context.Update(oldRoom);
                         }
 
-                        // Eski odadan çıkar
-                        var oldRoom = oldStudent.Room;
-                        oldRoom.CurrentCapacity--;
-                        oldRoom.CurrentStudentNumber--;
-                        oldRoom.Dormitory.DormitoryCurrentCapacity--;
-
-                        // Yeni odaya ekle
+                        // Yeni oda bilgileri
                         var newRoom = await _context.Rooms
                             .Include(r => r.Dormitory)
                             .FirstOrDefaultAsync(r => r.RoomID == student.RoomId);
 
+                        if (newRoom == null)
+                        {
+                            ModelState.AddModelError("RoomId", "Seçilen oda bulunamadı.");
+                            await transaction.RollbackAsync();
+
+                            // ViewBag'leri doldur
+                            ViewBag.Dormitories = await _context.Dormitories
+                                .Where(d => !d.statusDeletedDormitory)
+                                .ToListAsync();
+                            ViewBag.Rooms = await _context.Rooms
+                                .Where(r => r.DormitoryID == student.DormitoryId && !r.statusDeletedRoom)
+                                .ToListAsync();
+
+                            return View(student);
+                        }
+
                         if (newRoom.CurrentCapacity >= newRoom.Capacity)
                         {
                             ModelState.AddModelError("RoomId", "Seçilen oda dolu.");
+                            await transaction.RollbackAsync();
+
+                            // ViewBag'leri doldur
+                            ViewBag.Dormitories = await _context.Dormitories
+                                .Where(d => !d.statusDeletedDormitory)
+                                .ToListAsync();
+                            ViewBag.Rooms = await _context.Rooms
+                                .Where(r => r.DormitoryID == student.DormitoryId && !r.statusDeletedRoom)
+                                .ToListAsync();
+
                             return View(student);
                         }
 
                         newRoom.CurrentCapacity++;
                         newRoom.CurrentStudentNumber++;
                         newRoom.Dormitory.DormitoryCurrentCapacity++;
-
-                        student.UpdatedAt = DateTime.Now;
                         student.DormitoryId = newRoom.DormitoryID;
-
-                        _context.Entry(oldStudent).CurrentValues.SetValues(student);
-                        await _context.SaveChangesAsync();
-                        await transaction.CommitAsync();
-
-                        return RedirectToAction(nameof(Index));
+                        _context.Update(newRoom);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        await transaction.RollbackAsync();
-                        ModelState.AddModelError("", "Öğrenci güncellenirken bir hata oluştu: " + ex.Message);
+                        // Oda değişmiyorsa eski yurt ID'sini koru
+                        student.DormitoryId = oldStudent.DormitoryId;
                     }
+
+                    // Öğrenciyi güncelle
+                    _context.Entry(oldStudent).CurrentValues.SetValues(student);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return RedirectToAction(nameof(Index));
                 }
             }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Güncelleme sırasında bir hata oluştu: " + ex.Message);
+            }
 
-            ViewBag.Dormitories = await _context.Dormitories.ToListAsync();
+            // Hata durumunda ViewBag'leri doldur
+            ViewBag.Dormitories = await _context.Dormitories
+                .Where(d => !d.statusDeletedDormitory)
+                .ToListAsync();
             ViewBag.Rooms = await _context.Rooms
-                .Where(r => r.DormitoryID == student.DormitoryId)
+                .Where(r => r.DormitoryID == student.DormitoryId && !r.statusDeletedRoom)
                 .ToListAsync();
 
             return View(student);
