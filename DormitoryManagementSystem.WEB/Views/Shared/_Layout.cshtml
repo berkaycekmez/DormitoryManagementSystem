@@ -2,7 +2,6 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,9 +10,280 @@
     <title>Öğrenci Yurt Sistemi</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        /* Temel renkler */
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar tasarımı */
+        .navbar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: 12px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 20px;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+            .navbar-brand:hover {
+                background-color: rgba(255,255,255,0.1);
+            }
+
+        .nav-link {
+            padding: 8px 16px !important;
+            border-radius: 8px;
+            margin: 0 2px;
+            color: rgba(255,255,255,0.9) !important;
+        }
+
+            .nav-link:hover {
+                background-color: rgba(255,255,255,0.1);
+                color: #ffffff !important;
+            }
+
+        /* Ana container */
+        .container.mt-4 {
+            flex: 1;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            padding: 32px;
+            margin-top: 32px !important;
+            margin-bottom: 32px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #ffffff;
+            padding: 16px 0;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        /* Buton stilleri */
+        .btn-link {
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }
+
+            .btn-link:hover {
+                background-color: rgba(255,255,255,0.1);
+            }
+
+        /* Navbar içindeki hoş geldin mesajı */
+        .nav-link span {
+            background-color: rgba(255,255,255,0.1);
+            padding: 6px 16px;
+            border-radius: 8px;
+            margin-right: 16px;
+        }
+
+        /* Form elemanları */
+        .form-control {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 16px;
+        }
+
+            .form-control:focus {
+                box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+                border-color: #2563eb;
+            }
+
+        /* Kart tasarımı */
+        .card {
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .navbar-dark .navbar-toggler {
+            border: none;
+            padding: 8px;
+        }
+
+            .navbar-dark .navbar-toggler:focus {
+                box-shadow: none;
+            }
+
+        /* Tablo tasarımı */
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+            .table th {
+                background-color: #f8fafc;
+                border-bottom: 2px solid #e2e8f0;
+            }
+
+            .table td {
+                vertical-align: middle;
+                border-bottom: 1px solid #e2e8f0;
+            }
+    </style>
+    <style>
+        /* Ortak Kart Tasarımı */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Form Tasarımı */
+        .form-control {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s;
+        }
+
+            .form-control:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            }
+
+        /* Buton Tasarımı */
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background: #1d4ed8;
+                transform: translateY(-1px);
+            }
+
+        .btn-danger {
+            background: #dc2626;
+            border: none;
+        }
+
+            .btn-danger:hover {
+                background: #b91c1c;
+            }
+
+        .btn-warning {
+            background: #f59e0b;
+            border: none;
+            color: white;
+        }
+
+            .btn-warning:hover {
+                background: #d97706;
+                color: white;
+            }
+
+        .btn-secondary {
+            background: #6b7280;
+            border: none;
+        }
+
+            .btn-secondary:hover {
+                background: #4b5563;
+            }
+
+        /* Tablo Tasarımı */
+        .table {
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+            .table thead th {
+                border: none;
+                background: #f8fafc;
+                padding: 1rem;
+                font-weight: 600;
+                color: #1e293b;
+            }
+
+            .table tbody tr {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                transition: all 0.2s;
+            }
+
+                .table tbody tr:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                }
+
+            .table td {
+                padding: 1rem;
+                vertical-align: middle;
+                background: white;
+                border: none;
+            }
+
+        /* Resim Tasarımı */
+        img {
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        /* Form Grup Tasarımı */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+            .form-group label {
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                color: #1e293b;
+            }
+
+        /* Validation */
+        .text-danger {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Description List */
+        dl.row {
+            margin-bottom: 2rem;
+        }
+
+        dt {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        dd {
+            color: #4b5563;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">Yurt Sistemi</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -21,9 +291,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
-                    </li>
                     @if (SignInManager.IsSignedIn(User))
                     {
                         <li class="nav-item">
@@ -73,7 +340,7 @@
         @RenderBody()
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer">
         <div class="container">
             &copy; @DateTime.Now.Year - Öğrenci Yurt Sistemi
         </div>
