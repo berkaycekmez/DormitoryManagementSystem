@@ -3,12 +3,13 @@ using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Mscc.GenerativeAI;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var apiKey = "AIzaSyB7jaLJB5nipqk0-gQ2wIlr7u9Vi881a4s";
 // Add services to the container.  
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddSingleton<GoogleAI>(new GoogleAI());
 // DB Context  
 builder.Services.AddDbContext<MyDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("Mysql"),
