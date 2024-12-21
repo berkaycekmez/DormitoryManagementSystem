@@ -56,21 +56,15 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 $"Öðrenci Ýsmi: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
 
             request.UserMessage += $": NOT! Sen bir yapay zeka asistanısın ve yalnızca veritabanındaki verilere dayanarak cevap vermekle yükümlüsün. Ancak, verilen soruları tekrar etme; direkt cevap ver. Şimdi sana veritabanındaki verileri veriyorum. Bilgileri dikkate alarak soruları yanıtla: " +
-$"Yurt bilgileri: {dormitoryInfo}. " +
-$"Yurtların odaları hakkındaki bilgiler: {roomInfo}. " +
-$"Ve son olarak yurtların odalarında kalan öğrencilerin bilgileri: {studentInfo}. " +
-$"Kullanıcıların istediği bilgilere bu verilerden ulaşabiliyorsan düzgün bir şekilde açıklayarak anlat." +
-$"Sana öğrenciler,yurtlar,odalar ve bunların ekleme,silme,güncelleme işlemleri ile ilgili sorulan ve söylenen her şey sistemle ilgili.Hepsine sistemden ve buprojeden bir cevap bulup yanıtlandırmak ve veri döndürmek zorundasın!" +
-$"Eğer silmek istediği şey verdiğim verilerde mevcut ise o verinin sadece ve sadece id'sini response olarak dön ama response'da sadece id'si yazsın."+
-$"ÖNCELİKLE UNUTMA, SENİN BİRİNCİ VAZİFEN ORTADA DELETE İŞLEMİ YOKSA HİÇBİR VERİNİN ID'SİNİ KİMLİĞİNİ RESPONSE OLARAK VERME. Ama delete varsa sadece id vereceksin." +
-$"AYRICA ASLA NULL RESPONSE DÖNME; HEP BİR CEVABIN OLSUN, EN KÖTÜ BİLMİYORSAN DA \"Bilmiyorum\" de. " +
-$"Eğer ki kullanıcı senden delete - silme işlemi isterse, örneğin 'Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öğrenciyi sil' 'Ömer isimli öğrenciyi sil' derse veya '1. kat 1. odayı sil' derse ya da 'şu isimli yurdu sil' derse, lütfen önce veritabanındaki verilere bak ve eşleşen veri olup olmadığını kontrol et. " +
-$"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktadır.\" şeklinde yanıt ver. ";
-
-<<<<<<< HEAD
-            // AI prompt ve i�lemleri...
-            
-=======
+    $"Yurt bilgileri: {dormitoryInfo}. " +
+    $"Yurtların odaları hakkındaki bilgiler: {roomInfo}. " +
+    $"Ve son olarak yurtların odalarında kalan öğrencilerin bilgileri: {studentInfo}. " +
+    $"Kullanıcıların istediği bilgilere bu verilerden ulaşabiliyorsan düzgün bir şekilde açıklayarak anlat"+
+    $"ÖNCELİKLE UNUTMA, SENİN BİRİNCİ VAZİFEN UPDATE VEYA DELETE İŞLEMİ YOKSA, HİÇBİR VERİNİN ID'SİNİ KİMLİĞİNİ RESPONSE OLARAK VERME. " +
+    $"AYRICA ASLA NULL RESPONSE DÖNME; HEP BİR CEVABIN OLSUN, EN KÖTÜ BİLMİYORSAN DA \"Bilmiyorum\" de. " +
+    $"Eğer ki kullanıcı senden delete - silme işlemi isterse, örneğin 'Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öğrenciyi sil' 'Ömer isimli öğrenciyi sil' derse veya '1. kat 1. odayı sil' derse ya da 'şu isimli yurdu sil' derse, lütfen önce veritabanındaki verilere bak ve eşleşen veri olup olmadığını kontrol et. " +
+    $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktadır.\" şeklinde yanıt ver. " +
+    $"Eğer silmek istediği şey verdiğim verilerde mevcut ise idsini response olarak dön ama response da sadece id si yazsın";
 
 >>>>>>> 3b7a42fb66720c4b45f7a170683f7bfd040df4bc
             var model = _googleAI.GenerativeModel(Model.GeminiPro);
@@ -78,10 +72,7 @@ $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktad�
 
             string responseText = FormatResponse(response.Text);
 
-<<<<<<< HEAD
-=======
-             
->>>>>>> 3b7a42fb66720c4b45f7a170683f7bfd040df4bc
+
             if (!Guid.TryParse(response.Text, out Guid id))
             {
                 return Json(new { response = responseText });

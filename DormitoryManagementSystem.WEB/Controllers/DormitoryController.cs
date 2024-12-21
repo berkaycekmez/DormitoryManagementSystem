@@ -149,7 +149,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             {
                 return NotFound();
             }
-
+            ViewBag.cap = dormitory.DormitoryCurrentCapacity;
             ViewBag.Images = GetImagesList();
             return View(dormitory);
         }
@@ -158,6 +158,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, Dormitory dormitory)
         {
+
+
             if (id != dormitory.DormitoryID)
             {
                 return NotFound();
@@ -167,6 +169,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             {
                 try
                 {
+
                     context.Update(dormitory);
                     await context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));

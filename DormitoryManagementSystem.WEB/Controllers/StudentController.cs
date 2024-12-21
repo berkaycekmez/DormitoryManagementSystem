@@ -107,7 +107,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             // ViewBag'e atamaları yapalım
             ViewBag.Images = imagesList;
-            ViewBag.Dormitories = await _context.Dormitories.ToListAsync();
+            ViewBag.Dormitories = await _context.Dormitories.Where(x=>x.statusDeletedDormitory==false).ToListAsync();
             return View();
         }
 
@@ -364,7 +364,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 try
                 {
                     // Öğrenciyi soft delete yap
-                    student.statusDeletedStudent = false;
+                    student.statusDeletedStudent = true;
                     student.UpdatedAt = DateTime.Now;
 
                     // Oda ve yurt kapasitesini güncelle
