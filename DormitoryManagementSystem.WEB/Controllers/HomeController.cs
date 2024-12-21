@@ -21,23 +21,12 @@ namespace DormitoryManagementSystem.WEB.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<Dormitory> dormitories = context.Dormitories
-                .Where(x => x.statusDeletedDormitory == false)
-                .ToList();
-
-            foreach (var dormitory in dormitories)
+            IEnumerable<Dormitory> dormitories = new List<Dormitory>();
+            dormitories = context.Dormitories.Where(x => x.statusDeletedDormitory == false).ToList();
+            foreach (var item in dormitories)
             {
-                // Sıfıra bölünmeyi önle
-                if (dormitory.DormitoryCapacity > 0)
-                {
-                    dormitory.OccupancyRate = dormitory.DormitoryCurrentCapacity * 100 / dormitory.DormitoryCapacity;
-                }
-                else
-                {
-                    dormitory.OccupancyRate = 0;
-                }
+                item.OccupancyRate = item.DormitoryCurrentCapacity * 100 / item.DormitoryCapacity;
             }
-
             return View(dormitories);
         }
 

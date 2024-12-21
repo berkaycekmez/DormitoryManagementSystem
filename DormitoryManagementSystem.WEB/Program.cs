@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Mscc.GenerativeAI;
 
 var builder = WebApplication.CreateBuilder(args);
-var apiKey = "AIzaSyB7jaLJB5nipqk0-gQ2wIlr7u9Vi881a4s";
+var apiKey = "AIzaSyCGtGtfwE3YJqMhp0X95QZSXK_3ZhZae6Y";
 // Add services to the container.  
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<GoogleAI>(new GoogleAI());
