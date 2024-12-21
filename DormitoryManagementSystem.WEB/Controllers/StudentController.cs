@@ -1,11 +1,13 @@
 ﻿using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DormitoryManagementSystem.WEB.Controllers
 {
-    
+    [Authorize(Roles = "Admin")]
+
     public class StudentController : Controller
     {
         private readonly MyDbContext _context;
@@ -14,6 +16,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             _context = context;
         }
+        
+
         private List<string> GetImagesList()
         {
             try
@@ -46,7 +50,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return new List<string>();
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("Student/GetAvailableRooms/{dormitoryId}")]
         public async Task<JsonResult> GetAvailableRooms([FromRoute] Guid dormitoryId)
         {
@@ -71,7 +75,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return Json(new { error = ex.Message });
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Index(string search)
         {
@@ -92,7 +96,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             var students = await query.ToListAsync();
             return View(students);
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             var imagesList = GetImagesList();
@@ -107,7 +111,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View();
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Student student)
@@ -181,7 +185,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
 
 
-
+        [Authorize(Roles = "Admin")]
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
@@ -208,6 +212,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return View(student);
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Student student)
@@ -323,7 +329,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return View(student);
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var student = await _context.Students
@@ -338,7 +344,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return View(student);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

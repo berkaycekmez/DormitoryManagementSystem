@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<div class="container">
+    <h2>Admin Paneli</h2>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Yurt Yönetimi</h5>
+                    <p class="card-text">Yurt ekle, düzenle, sil</p>
+                    <a asp-controller="Dormitory" asp-action="Index" class="btn btn-primary">Yönet</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Öğrenci Yönetimi</h5>
+                    <p class="card-text">Öğrenci ekle, düzenle, sil</p>
+                    <a asp-controller="Student" asp-action="Index" class="btn btn-primary">Yönet</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Oda Yönetimi</h5>
+                    <p class="card-text">Oda ekle, düzenle, sil</p>
+                    <a asp-controller="Room" asp-action="Index" class="btn btn-primary">Yönet</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

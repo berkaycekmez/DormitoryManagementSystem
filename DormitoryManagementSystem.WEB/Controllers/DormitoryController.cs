@@ -1,10 +1,13 @@
 ﻿using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DormitoryManagementSystem.WEB.Controllers
 {
+    [Authorize]
+
     public class DormitoryController : Controller
     {
         MyDbContext context;
@@ -12,7 +15,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             context = _context;
         }
-
+        
         private List<string> GetImagesList()
         {
             try
@@ -43,14 +46,14 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View(dormitories);
         }
 
-
+        [Authorize(Roles = "Admin")] 
         public IActionResult Create()
         {
             ViewBag.Images = GetImagesList();
 
             return View();
         }
-
+        [Authorize(Roles = "Admin")] 
         [HttpPost]
         public async Task<IActionResult> Create(Dormitory dormitory,int RoomCount)
         {
@@ -87,6 +90,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return View(dormitory);
         }
+
+        [Authorize(Roles = "Admin")] 
         [HttpGet]
         public IActionResult Delete(Guid id)
         {
@@ -101,7 +106,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return View(dormitory);
         }
-
+        [Authorize(Roles = "Admin")] 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
@@ -131,7 +136,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return RedirectToAction("Index");
         }
 
-
+        [Authorize(Roles = "Admin")] 
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
@@ -148,11 +153,11 @@ namespace DormitoryManagementSystem.WEB.Controllers
             ViewBag.Images = GetImagesList();
             return View(dormitory);
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, Dormitory dormitory)
         {
-
-
             if (id != dormitory.DormitoryID)
             {
                 return NotFound();
@@ -162,8 +167,51 @@ namespace DormitoryManagementSystem.WEB.Controllers
             {
                 try
                 {
+                    // Get the existing dormitory with its rooms and students
+                    var existingDormitory = await context.Dormitories
+                        .Include(d => d.Rooms)
+                        .ThenInclude(r => r.Students)
+                        .FirstOrDefaultAsync(d => d.DormitoryID == id);
 
-                    context.Update(dormitory);
+                    if (existingDormitory == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Calculate total current students
+                    int totalStudents = existingDormitory.Rooms.Sum(r => r.Students.Count(s => !s.statusDeletedStudent));
+
+                    // Check if new capacity is less than current student count
+                    if (dormitory.DormitoryCapacity < totalStudents)
+                    {
+                        ModelState.AddModelError("DormitoryCapacity",
+                            $"Yurt kapasitesi mevcut öğrenci sayısından ({totalStudents}) az olamaz.");
+                        ViewBag.cap = existingDormitory.DormitoryCurrentCapacity;
+                        ViewBag.Images = GetImagesList();
+                        return View(dormitory);
+                    }
+
+                    // Update the dormitory properties while preserving current capacity
+                    existingDormitory.DormitoryName = dormitory.DormitoryName;
+                    existingDormitory.Address = dormitory.Address;
+                    existingDormitory.Phone = dormitory.Phone;
+                    existingDormitory.DormitoryPhotoUrl = dormitory.DormitoryPhotoUrl;
+                    existingDormitory.DormitoryCapacity = dormitory.DormitoryCapacity;
+                    existingDormitory.DormitoryCurrentCapacity = totalStudents;
+
+                    // Update room capacities proportionally
+                    int activeRoomCount = existingDormitory.Rooms.Count(r => !r.statusDeletedRoom);
+                    if (activeRoomCount > 0)
+                    {
+                        int baseCapacityPerRoom = dormitory.DormitoryCapacity / activeRoomCount;
+                        int remainingCapacity = dormitory.DormitoryCapacity % activeRoomCount;
+
+                        foreach (var room in existingDormitory.Rooms.Where(r => !r.statusDeletedRoom))
+                        {
+                            room.Capacity = baseCapacityPerRoom + (remainingCapacity-- > 0 ? 1 : 0);
+                        }
+                    }
+
                     await context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
@@ -179,6 +227,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
                     }
                 }
             }
+            ViewBag.Images = GetImagesList();
             return View(dormitory);
         }
     }
