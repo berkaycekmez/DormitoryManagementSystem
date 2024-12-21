@@ -1,0 +1,47 @@
+﻿@model DormitoryManagementSystem.MODEL.Room
+
+<div class="card">
+    <div class="card-header">
+        <h3>Yeni Oda Ekle</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div class="form-group mb-3">
+                <label asp-for="Number" class="form-label">Oda Numarası</label>
+                <input asp-for="Number" class="form-control" />
+                <span asp-validation-for="Number" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Floor" class="form-label">Kat</label>
+                <input asp-for="Floor" class="form-control" />
+                <span asp-validation-for="Floor" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Capacity" class="form-label">Kapasite</label>
+                <input asp-for="Capacity" class="form-control" />
+                <span asp-validation-for="Capacity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="DormitoryID">Yurt</label>
+                <select asp-for="DormitoryID" class="form-control" asp-items="ViewBag.Dormitories">
+                    <option value="">-- Yurt Seçiniz --</option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-action="Index" class="btn btn-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
