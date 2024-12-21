@@ -11,9 +11,7 @@ namespace DormitoryManagementSystem.MODEL
         public Room()
         {
             Students = new List<Student>();
-        
         }
-
         public Guid RoomID { get; set; }
         public int Number { get; set; }
         public int Capacity { get; set; }
@@ -22,8 +20,7 @@ namespace DormitoryManagementSystem.MODEL
         public int CurrentStudentNumber { get; set; }
 
         public Guid DormitoryID { get; set; }
-        public  Dormitory Dormitory { get; set; }
+        public Dormitory Dormitory { get; set; }
         public List<Student> Students { get; set; }
-
     }
 }

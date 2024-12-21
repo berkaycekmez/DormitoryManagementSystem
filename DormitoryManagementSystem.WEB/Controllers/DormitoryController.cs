@@ -23,7 +23,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View();
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Create(Dormitory dormitory)
         {

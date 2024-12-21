@@ -41,13 +41,13 @@ namespace DormitoryManagementSystem.WEB.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Room room,Guid DormitoryID)
+        public async Task<IActionResult> Create(Room room, Guid DormitoryID)
         {
             if (!ModelState.IsValid)
             {
-                room.RoomID=Guid.NewGuid();
+                room.RoomID = Guid.NewGuid();
                 room.CurrentCapacity = 0;
-                room.DormitoryID=DormitoryID;
+                room.DormitoryID = DormitoryID;
                 context.Rooms.Add(room);
                 await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
