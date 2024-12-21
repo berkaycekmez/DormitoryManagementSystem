@@ -24,6 +24,7 @@ namespace DormitoryManagementSystem.MODEL
         public int DormitoryCurrentCapacity { get; set; }
         public double OccupancyRate { get; set; }
 
+        public bool statusDeletedDormitory { get; set; }
         public List<Room> Rooms { get; set; }
         public List<Student> Students { get; set; }
     }

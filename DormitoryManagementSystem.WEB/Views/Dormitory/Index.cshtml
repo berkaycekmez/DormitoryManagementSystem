@@ -3,11 +3,10 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3>Yurtlar</h3>
         <div>
-            @if (User.IsInRole("Admin"))
-            {
+           
                 <a asp-action="Create" class="btn btn-primary">Yeni Yurt Ekle</a>
-            }
-            <a asp-action="Create" class="btn btn-success ml-2">Yeni Yurt Oluştur</a> <!-- Yeni buton eklendi -->
+           
+
         </div>
     </div>
     <div class="card-body">
@@ -33,14 +32,12 @@
                             <td>@dormitory.DormitoryName</td>
                             <td>@dormitory.Address</td>
                             <td>@dormitory.Phone</td>
-                            <td>@dormitory.DormitoryCurrentCapacity/@dormitory.DormitoryCapacity %</td>
+                            <td>@(dormitory.DormitoryCurrentCapacity * 100 / dormitory.DormitoryCapacity)%</td>
                             <td>
-                                <a asp-action="Details" asp-route-id="@dormitory.DormitoryID" class="btn btn-info btn-sm">Detay</a>
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <a asp-action="Edit" asp-route-id="@dormitory.DormitoryID" class="btn btn-warning btn-sm">Düzenle</a>
-                                    <a asp-action="Delete" asp-route-id="@dormitory.DormitoryID" class="btn btn-danger btn-sm">Sil</a>
-                                }
+                                    <a asp-controller="Dormitory" asp-action="Edit" asp-route-id="@dormitory.DormitoryID" class="btn btn-warning">Düzenle</a>
+                                    <a asp-controller="Dormitory" asp-action="Delete" asp-route-id="@dormitory.DormitoryID" class="btn btn-danger"
+                                       onclick="return confirm('Bu yurdu silmek istediğinize emin misiniz?')">Sil</a>
+                                
                             </td>
                         </tr>
                     }

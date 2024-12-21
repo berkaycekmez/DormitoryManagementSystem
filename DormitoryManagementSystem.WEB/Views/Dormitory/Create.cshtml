@@ -31,10 +31,22 @@
                         <input asp-for="DormitoryCapacity" class="form-control" type="number" min="1" required />
                         <span asp-validation-for="DormitoryCapacity" class="text-danger"></span>
                     </div>
+                    <div class="form-group mb-3">
+                        <label for="RoomCount" class="control-label">Oda Sayısı</label>
+                        <input id="RoomCount" name="RoomCount" class="form-control" type="number" min="1" required />
+                        <span class="text-danger"></span>
+                    </div>
+
 
                     <div class="form-group mb-3">
-                        <label asp-for="DormitoryPhotoUrl" class="control-label">Fotoğraf URL</label>
-                        <input asp-for="DormitoryPhotoUrl" class="form-control" required />
+                        <label asp-for="DormitoryPhotoUrl" class="control-label">Fotoğraf</label>
+                        <select asp-for="DormitoryPhotoUrl" class="form-control">
+                            <option value="">Fotoğraf Seçin</option>
+                            @foreach (var image in ViewBag.Images)
+                            {
+                                <option value="@image">@image.Replace("/images/", "")</option>
+                            }
+                        </select>
                         <span asp-validation-for="DormitoryPhotoUrl" class="text-danger"></span>
                     </div>
                 </div>

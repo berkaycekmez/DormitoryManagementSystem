@@ -18,8 +18,9 @@ namespace DormitoryManagementSystem.WEB.Controllers
         public IActionResult Index(string search)
         {
             var rooms = context.Rooms
+                .Where(r => !r.statusDeletedRoom)  // Soft delete işlemi
                 .Include(x => x.Dormitory)
-                .AsNoTracking()  // Performans için
+                .AsNoTracking()
                 .ToList();
 
             if (!string.IsNullOrEmpty(search))
@@ -27,13 +28,9 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 rooms = rooms.Where(r => r.Number.ToString().Contains(search)).ToList();
             }
 
-            if (rooms == null)
-            {
-                return View(new List<Room>());  // 
-            }
-
             return View(rooms);
         }
+
         public IActionResult Create()
         {
             ViewBag.Dormitories = new SelectList(context.Dormitories, "DormitoryID", "DormitoryName");
@@ -55,6 +52,128 @@ namespace DormitoryManagementSystem.WEB.Controllers
             }
             return View(room);
         }
+        public IActionResult Delete(Guid id)
+        {
+            var room = context.Rooms
+                .Include(x => x.Dormitory)
+                .FirstOrDefault(r => r.RoomID == id);
 
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            return View(room);
+        }
+
+        [HttpPost, ActionName("DeleteConfirmed")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        {
+            var room = await context.Rooms
+                .Include(r => r.Students)
+                .FirstOrDefaultAsync(r => r.RoomID == id);
+
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            // Odayı ve öğrencilerini soft delete yap
+            room.statusDeletedRoom = true; // Odayı silindi olarak işaretle
+            foreach (var student in room.Students)
+            {
+                student.statusDeletedStudent = true; // Öğrencileri de silindi olarak işaretle
+            }
+
+            await context.SaveChangesAsync(); // Değişiklikleri veritabanına kaydet
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var room = await context.Rooms
+                .Include(r => r.Dormitory)
+                .Include(r => r.Students)
+                .FirstOrDefaultAsync(r => r.RoomID == id);
+
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Dormitories = new SelectList(context.Dormitories.Where(d => !d.statusDeletedDormitory),
+                "DormitoryID", "DormitoryName", room.DormitoryID);
+
+            return View(room);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid id, Room room)
+        {
+            if (id != room.RoomID)
+            {
+                return NotFound();
+            }
+
+            var existingRoom = await context.Rooms
+                .Include(r => r.Students)
+                .FirstOrDefaultAsync(r => r.RoomID == id);
+
+            if (existingRoom == null)
+            {
+                return NotFound();
+            }
+
+            // Kapasite kontrolü
+            if (room.Capacity < existingRoom.CurrentCapacity)
+            {
+                ModelState.AddModelError("Capacity",
+                    $"Kapasite mevcut öğrenci sayısından ({existingRoom.CurrentCapacity}) az olamaz!");
+                ViewBag.Dormitories = new SelectList(context.Dormitories.Where(d => !d.statusDeletedDormitory),
+                    "DormitoryID", "DormitoryName", room.DormitoryID);
+                return View(room);
+            }
+
+            try
+            {
+                // Mevcut değerleri koru
+                room.CurrentCapacity = existingRoom.CurrentCapacity;
+                room.CurrentStudentNumber = existingRoom.CurrentStudentNumber;
+
+                // Yurt değişikliği varsa kontrol et
+                if (existingRoom.DormitoryID != room.DormitoryID)
+                {
+                    var newDormitory = await context.Dormitories
+                        .FirstOrDefaultAsync(d => d.DormitoryID == room.DormitoryID);
+
+                    if (newDormitory == null)
+                    {
+                        ModelState.AddModelError("DormitoryID", "Seçilen yurt bulunamadı.");
+                        ViewBag.Dormitories = new SelectList(context.Dormitories.Where(d => !d.statusDeletedDormitory),
+                            "DormitoryID", "DormitoryName", room.DormitoryID);
+                        return View(room);
+                    }
+                }
+
+                context.Entry(existingRoom).CurrentValues.SetValues(room);
+                await context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await context.Rooms.AnyAsync(r => r.RoomID == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
     }
 }
