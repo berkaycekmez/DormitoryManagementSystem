@@ -1,0 +1,113 @@
+﻿@model Student
+
+<div class="card">
+    <div class="card-header">
+        <h3>Yeni Öğrenci Ekle</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FirstName">Ad</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName">Soyad</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone">Telefon</label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhotoUrl">Fotoğraf URL</label>
+                <input asp-for="PhotoUrl" class="form-control" />
+                <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DormitoryId">Yurt</label>
+                <select asp-for="DormitoryId" class="form-control" id="dormitorySelect">
+                    <option value="">-- Yurt Seçin --</option>
+                    @foreach (var dormitory in ViewBag.Dormitories)
+                    {
+                        <option value="@dormitory.DormitoryID">@dormitory.DormitoryName</option>
+                    }
+                </select>
+                <span asp-validation-for="DormitoryId" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="RoomId">Oda</label>
+                <select asp-for="RoomId" class="form-control" id="roomSelect" disabled>
+                    <option value="">-- Önce Yurt Seçin --</option>
+                </select>
+                <span asp-validation-for="RoomId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-action="Index" class="btn btn-secondary">İptal</a>
+            </div>
+
+            
+        </form>
+    </div>
+</div>
+
+<!-- jQuery'yi yükleyin -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#dormitorySelect').change(function () {
+            var dormitoryId = $(this).val();
+            console.log("Seçilen yurt ID:", dormitoryId); // Değeri konsolda kontrol edin
+
+            // Eğer boşsa veya geçersizse bir hata mesajı göster
+            if (!dormitoryId || dormitoryId === '00000000-0000-0000-0000-000000000000') {
+                alert("Geçerli bir yurt seçmelisiniz.");
+                return;
+            }
+
+            var roomSelect = $('#roomSelect');
+            roomSelect.empty();
+            roomSelect.append('<option value="">-- Oda Seçin --</option>');
+
+            if (dormitoryId) {
+                $.ajax({
+                    url: `/Student/GetAvailableRooms/${dormitoryId}`,
+                    method: 'GET',
+                    success: function (data) {
+                        console.log("Gelen odalar:", data);
+                        if (data && data.length > 0) {
+                            data.forEach(function (room) {
+                                roomSelect.append($('<option></option>')
+                                    .attr('value', room.roomID)
+                                    .text(`Oda ${room.number} (${room.currentCapacity}/${room.capacity})`));
+                            });
+                            roomSelect.prop('disabled', false); // Oda seçim alanını etkinleştir
+                        } else {
+                            roomSelect.append('<option value="">Bu yurtta uygun oda bulunmamaktadır</option>');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Hata:", error);
+                        console.error("Status:", status);
+                        console.error("Response:", xhr.responseText);
+                        roomSelect.append('<option value="">Odalar yüklenirken hata oluştu</option>');
+                    }
+                });
+            } else {
+                roomSelect.prop('disabled', true); // Yurt seçilmediyse oda seçim alanını devre dışı bırak
+                roomSelect.append('<option value="">-- Önce Yurt Seçin --</option>');
+            }
+        });
+    });
+
+
+
+</script>
