@@ -56,10 +56,12 @@ namespace DormitoryManagementSystem.WEB.Controllers
 $"Yurt bilgileri: {dormitoryInfo}. " +
 $"Yurtların odaları hakkındaki bilgiler: {roomInfo}. " +
 $"Ve son olarak yurtların odalarında kalan öğrencilerin bilgileri: {studentInfo}. " +
+$"şunda anlaşalım senin önceliğin kullanıcının silmek istediği verinin idsini direkt olarak döndürmek bunu sakın unutma!!" +
 $"Kullanıcıların istediği bilgilere bu verilerden ulaşabiliyorsan düzgün bir şekilde açıklayarak anlat." +
 $"Sana öğrenciler,yurtlar,odalar ve bunların ekleme,silme,güncelleme işlemleri ile ilgili sorulan ve söylenen her şey sistemle ilgili.Hepsine sistemden ve buprojeden bir cevap bulup yanıtlandırmak ve veri döndürmek zorundasın!" +
 $"Eğer silmek istediği şey verdiğim verilerde mevcut ise o verinin sadece ve sadece id'sini response olarak dön ama response'da sadece id'si yazsın."+
 $"ÖNCELİKLE UNUTMA, SENİN BİRİNCİ VAZİFEN ORTADA DELETE İŞLEMİ YOKSA HİÇBİR VERİNİN ID'SİNİ KİMLİĞİNİ RESPONSE OLARAK VERME. Ama delete varsa sadece id vereceksin." +
+$"şunda anlaşalım senin önceliğin kullanıcının silmek istediği verinin idsini direkt olarak döndürmek bunu sakın unutma!!"+
 $"AYRICA ASLA NULL RESPONSE DÖNME; HEP BİR CEVABIN OLSUN, EN KÖTÜ BİLMİYORSAN DA \"Bilmiyorum\" de. " +
 $"Eğer ki kullanıcı senden delete - silme işlemi isterse, örneğin 'Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öğrenciyi sil' 'Ömer isimli öğrenciyi sil' derse veya '1. kat 1. odayı sil' derse ya da 'şu isimli yurdu sil' derse, lütfen önce veritabanındaki verilere bak ve eşleşen veri olup olmadığını kontrol et. " +
 $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktadır.\" şeklinde yanıt ver. ";
@@ -86,7 +88,7 @@ $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktad�
                 student.statusDeletedStudent = true;
                 context.Update(student);
                 context.SaveChanges();
-                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
+                return Json(new { response = $"İstemiş olduğunuz silme isteği başarıyla gerçekleşmiştir." });
             }
             else if (roomIds.Contains(id))
             {
@@ -94,7 +96,7 @@ $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktad�
                 room.statusDeletedRoom = true;
                 context.Update(room);
                 context.SaveChanges();
-                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
+                return Json(new { response = $"İstemiş olduğunuz silme isteği başarıyla gerçekleşmiştir." });
             }
             else if (dormitoryIds.Contains(id))
             {
@@ -102,11 +104,11 @@ $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktad�
                 dormitory.statusDeletedDormitory = true;
                 context.Update(dormitory);
                 context.SaveChanges();
-                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
+                return Json(new { response = $"İstemiş olduğunuz silme isteği başarıyla gerçekleşmiştir." });
             }
             else
             {
-                return Json(new { response = "Geçersiz ID: Bu ID sistemde bulunmamaktadýr." });
+                return Json(new { response = "Geçersiz ID: Bu ID sistemde bulunmaktadır." });
             }
         }
         private string FormatResponse(string? responseText)
