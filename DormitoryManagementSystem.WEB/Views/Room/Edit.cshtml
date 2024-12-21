@@ -1,0 +1,56 @@
+﻿@model Room
+<div class="card">
+    <div class="card-header">
+        <h3>Oda Düzenle</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="RoomID" />
+            <input type="hidden" asp-for="DormitoryID" />
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Number" class="form-label">Oda Numarası</label>
+                    <input asp-for="Number" class="form-control" />
+                    <span asp-validation-for="Number" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Floor" class="form-label">Kat</label>
+                    <input asp-for="Floor" class="form-control" />
+                    <span asp-validation-for="Floor" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Capacity" class="form-label">Kapasite</label>
+                    <input asp-for="Capacity" class="form-control" />
+                    <span asp-validation-for="Capacity" class="text-danger"></span>
+                    @if (Model.CurrentCapacity > 0)
+                    {
+                        <small class="text-info">Mevcut Doluluk: @Model.CurrentCapacity</small>
+                    }
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DormitoryID" class="form-label">Yurt</label>
+                    <input type="text" class="form-control" value="@Model.Dormitory?.DormitoryName" readonly />
+                </div>
+            </div>
+
+            @if (Model.CurrentCapacity > 0)
+            {
+                <div class="alert alert-warning">
+                    <h5>Dikkat!</h5>
+                    <p>Bu odada şu anda @Model.CurrentCapacity öğrenci bulunmaktadır. Kapasiteyi mevcut öğrenci sayısının altına düşüremezsiniz.</p>
+                </div>
+            }
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <a asp-action="Index" class="btn btn-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
