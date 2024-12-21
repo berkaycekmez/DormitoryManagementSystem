@@ -1,4 +1,3 @@
-// Program.cs  
 using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL.User;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +6,6 @@ using Mscc.GenerativeAI;
 
 var builder = WebApplication.CreateBuilder(args);
 var apiKey = "AIzaSyCGtGtfwE3YJqMhp0X95QZSXK_3ZhZae6Y";
-// Add services to the container.  
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<GoogleAI>(new GoogleAI());
 // DB Context  
@@ -15,14 +13,14 @@ builder.Services.AddDbContext<MyDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("Mysql"),
     b => b.MigrationsAssembly("DormitoryManagementSystem.WEB")));
 
-// Authorization policy'leri ekleyin  
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdminRole",
         policy => policy.RequireRole("Admin"));
 });
 
-// Identity servisleri  
+// Identityservices
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -35,7 +33,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<MyDbContext>()
 .AddDefaultTokenProviders();
 
-// Cookie ayarlarý  
+// Cookie settings  
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {
@@ -47,13 +45,11 @@ builder.Services.AddAuthentication()
 
 var app = builder.Build();
 
-// Rolleri ve Admin kullanýcýsýný oluþtur  
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    // Rolleri oluþtur  
     var roles = new[] { "Admin", "User" };
     foreach (var role in roles)
     {
@@ -63,7 +59,6 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Admin kullanýcýsýný oluþtur  
     string adminEmail = "admin@example.com";
     string adminPassword = "Admin123!";
 

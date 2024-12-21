@@ -167,7 +167,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
             {
                 try
                 {
-                    // Get the existing dormitory with its rooms and students
                     var existingDormitory = await context.Dormitories
                         .Include(d => d.Rooms)
                         .ThenInclude(r => r.Students)
@@ -178,10 +177,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
                         return NotFound();
                     }
 
-                    // Calculate total current students
                     int totalStudents = existingDormitory.Rooms.Sum(r => r.Students.Count(s => !s.statusDeletedStudent));
 
-                    // Check if new capacity is less than current student count
                     if (dormitory.DormitoryCapacity < totalStudents)
                     {
                         ModelState.AddModelError("DormitoryCapacity",
@@ -191,7 +188,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
                         return View(dormitory);
                     }
 
-                    // Update the dormitory properties while preserving current capacity
                     existingDormitory.DormitoryName = dormitory.DormitoryName;
                     existingDormitory.Address = dormitory.Address;
                     existingDormitory.Phone = dormitory.Phone;
@@ -199,7 +195,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
                     existingDormitory.DormitoryCapacity = dormitory.DormitoryCapacity;
                     existingDormitory.DormitoryCurrentCapacity = totalStudents;
 
-                    // Update room capacities proportionally
                     int activeRoomCount = existingDormitory.Rooms.Count(r => !r.statusDeletedRoom);
                     if (activeRoomCount > 0)
                     {
