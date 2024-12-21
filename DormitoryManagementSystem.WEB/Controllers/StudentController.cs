@@ -15,6 +15,31 @@ namespace DormitoryManagementSystem.WEB.Controllers
             _context = context;
         }
 
+        [HttpGet("Student/GetAvailableRooms/{dormitoryId}")]
+        public async Task<JsonResult> GetAvailableRooms([FromRoute] Guid dormitoryId)
+        {
+            try
+            {
+                var rooms = await _context.Rooms
+                    .Where(r => r.DormitoryID == dormitoryId)
+                    .Select(r => new
+                    {
+                        roomID = r.RoomID,
+                        number = r.Number,
+                        capacity = r.Capacity,
+                        currentCapacity = r.CurrentCapacity,
+                        floor = r.Floor
+                    })
+                    .ToListAsync();
+
+                return Json(rooms);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index(string search)
         {
