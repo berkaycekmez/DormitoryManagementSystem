@@ -14,8 +14,11 @@ namespace DormitoryManagementSystem.WEB.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<Dormitory> dormitories = new List<Dormitory>();
-            dormitories = context.Dormitories.Include(y => y.Rooms).ToList();
+            IEnumerable<Dormitory> dormitories = context.Dormitories
+            .Include(y => y.Rooms)
+            .Where(d => !d.statusDeletedDormitory)
+            .ToList();
+
             return View(dormitories);
         }
 
@@ -63,37 +66,35 @@ namespace DormitoryManagementSystem.WEB.Controllers
         [HttpGet]
         public IActionResult Delete(Guid id)
         {
-            // Silinecek yurdu veritabanından getir  
-            var dormitory = context.Dormitories.Include(d => d.Rooms).FirstOrDefault(d => d.DormitoryID == id);
+            var dormitory = context.Dormitories
+                .Include(d => d.Rooms)
+                .FirstOrDefault(d => d.DormitoryID == id && !d.statusDeletedDormitory);
 
             if (dormitory == null)
             {
                 return NotFound();
             }
 
-            return View(dormitory); // Silme onayı için bir View gösterilebilir  
+            return View(dormitory);
         }
 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            // Silinecek yurdu ve ilişkili odaları veritabanından getir  
-            var dormitory = context.Dormitories.Include(d => d.Rooms).FirstOrDefault(d => d.DormitoryID == id);
+            var dormitory = await context.Dormitories
+                .Include(d => d.Rooms)
+                .FirstOrDefaultAsync(d => d.DormitoryID == id); // FirstOrDefaultAsync kullanımı
 
             if (dormitory != null)
             {
-                // İlgili odaları sil  
-                context.Rooms.RemoveRange(dormitory.Rooms);
-
-                // Yurdu sil  
-                context.Dormitories.Remove(dormitory);
-
-                // Değişiklikleri kaydet  
+                dormitory.statusDeletedDormitory = true;
                 await context.SaveChangesAsync();
             }
 
             return RedirectToAction("Index");
         }
+
+
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
