@@ -19,6 +19,9 @@ namespace DormitoryManagementSystem.MODEL
         public int Floor { get; set; }
         public int CurrentStudentNumber { get; set; }
 
+        public bool statusDeletedRoom { get; set; }
+
+
         public Guid DormitoryID { get; set; }
         public Dormitory Dormitory { get; set; }
         public List<Student> Students { get; set; }

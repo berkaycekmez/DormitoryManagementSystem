@@ -237,42 +237,27 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View(student);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var student = await _context.Students
+                .Include(s => s.Room)
+                .ThenInclude(r => r.Dormitory)
+                .FirstOrDefaultAsync(s => s.StudentId == id);
+
+            if (student == null)
             {
-                try
-                {
-                    var student = await _context.Students
-                        .Include(s => s.Room)
-                        .ThenInclude(r => r.Dormitory)
-                        .FirstOrDefaultAsync(s => s.StudentId == id);
-
-                    if (student != null)
-                    {
-                        student.Room.CurrentCapacity--;
-                        student.Room.CurrentStudentNumber--;
-                        student.Room.Dormitory.DormitoryCurrentCapacity--;
-                        student.Room.Dormitory.OccupancyRate =
-                            (student.Room.Dormitory.DormitoryCurrentCapacity * 100) /
-                            student.Room.Dormitory.DormitoryCapacity;
-
-                        _context.Students.Remove(student);
-                        await _context.SaveChangesAsync();
-                        await transaction.CommitAsync();
-                    }
-
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    return RedirectToAction(nameof(Index));
-                }
+                return NotFound();
             }
+
+            // Öğrenciyi sil
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<IActionResult> Details(Guid id)
         {

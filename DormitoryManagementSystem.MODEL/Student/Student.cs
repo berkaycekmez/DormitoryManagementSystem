@@ -18,6 +18,7 @@ namespace DormitoryManagementSystem.MODEL
         public string PhotoUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public bool statusDeletedStudent { get; set; }
 
         public Guid RoomId { get; set; }
         public Guid DormitoryId { get; set; }

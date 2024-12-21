@@ -55,6 +55,40 @@ namespace DormitoryManagementSystem.WEB.Controllers
             }
             return View(room);
         }
+        public IActionResult Delete(Guid id)
+        {
+            var room = context.Rooms
+                .Include(x => x.Dormitory)
+                .FirstOrDefault(r => r.RoomID == id);
+
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            return View(room);
+        }
+
+        // Silme işlemi onaylandıktan sonra oda silme
+        [HttpPost, ActionName("DeleteConfirmed")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        {
+            var room = await context.Rooms
+                .Include(x => x.Dormitory)
+                .FirstOrDefaultAsync(r => r.RoomID == id);
+
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            // Odayı sil
+            context.Rooms.Remove(room);
+            await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
 
     }
 }

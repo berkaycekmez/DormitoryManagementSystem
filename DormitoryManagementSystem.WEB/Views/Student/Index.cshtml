@@ -37,7 +37,11 @@
                            <td>
                                <a asp-action="Details" asp-route-id="@student.StudentId" class="btn btn-info btn-sm">Detay</a>
                                <a asp-action="Edit" asp-route-id="@student.StudentId" class="btn btn-warning btn-sm">Düzenle</a>
-                               <a asp-action="Delete" asp-route-id="@student.StudentId" class="btn btn-danger btn-sm">Sil</a>
+                               
+                               <!-- Silme işlemi için form ekleniyor -->
+                               <form asp-action="DeleteConfirmed" asp-route-id="@student.StudentId" method="post" style="display:inline;">
+                                   <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                               </form>
                            </td>
                        </tr>
                    }
