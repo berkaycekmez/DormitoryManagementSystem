@@ -80,15 +80,16 @@ namespace DormitoryManagementSystem.WEB.Controllers
             }
 
             // Odayı ve öğrencilerini soft delete yap
-            room.statusDeletedRoom = false; // Odayı silindi olarak işaretle
+            room.statusDeletedRoom = true; // Odayı silindi olarak işaretle
             foreach (var student in room.Students)
             {
-                student.statusDeletedStudent = false; // Öğrencileri de silindi olarak işaretle
+                student.statusDeletedStudent = true; // Öğrencileri de silindi olarak işaretle
             }
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(); // Değişiklikleri veritabanına kaydet
             return RedirectToAction(nameof(Index));
         }
+
 
 
 

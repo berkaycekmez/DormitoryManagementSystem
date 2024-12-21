@@ -15,6 +15,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             _context = context;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index(string search)
         {
             var query = _context.Students
@@ -35,38 +36,11 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View(students);
         }
 
-
         public async Task<IActionResult> Create()
         {
             ViewBag.Dormitories = await _context.Dormitories.ToListAsync();
             return View();
         }
-
-        [HttpGet("Student/GetAvailableRooms/{dormitoryId}")]
-        public async Task<JsonResult> GetAvailableRooms([FromRoute] Guid dormitoryId)
-        {
-            try
-            {
-                var rooms = await _context.Rooms
-                    .Where(r => r.DormitoryID == dormitoryId)
-                    .Select(r => new
-                    {
-                        roomID = r.RoomID,
-                        number = r.Number,
-                        capacity = r.Capacity,
-                        currentCapacity = r.CurrentCapacity,
-                        floor = r.Floor
-                    })
-                    .ToListAsync();
-
-                return Json(rooms);
-            }
-            catch (Exception ex)
-            {
-                return Json(new { error = ex.Message });
-            }
-        }
-
 
 
         [HttpPost]
@@ -75,10 +49,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             try
             {
-                // Debug için gelen değerleri yazdır
-                Console.WriteLine($"DormitoryId: {student.DormitoryId}");
-                Console.WriteLine($"RoomId: {student.RoomId}");
-
                 var room = await _context.Rooms
                     .Include(r => r.Dormitory)
                     .FirstOrDefaultAsync(r => r.RoomID == student.RoomId);
@@ -86,6 +56,14 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 if (room == null)
                 {
                     ModelState.AddModelError("RoomId", "Seçilen oda bulunamadı.");
+                    ViewBag.Dormitories = await _context.Dormitories.ToListAsync();
+                    return View(student);
+                }
+
+                // Oda durumu kontrolü
+                if (room.statusDeletedRoom)
+                {
+                    ModelState.AddModelError("RoomId", "Seçilen oda aktif değil.");
                     ViewBag.Dormitories = await _context.Dormitories.ToListAsync();
                     return View(student);
                 }
@@ -133,6 +111,11 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View(student);
         }
 
+
+
+
+
+        
 
 
         public async Task<IActionResult> Edit(Guid id)
@@ -258,7 +241,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 try
                 {
                     // Öğrenciyi soft delete yap
-                    student.statusDeletedStudent = true;
+                    student.statusDeletedStudent = false;
                     student.UpdatedAt = DateTime.Now;
 
                     // Oda ve yurt kapasitesini güncelle
@@ -277,6 +260,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
+                    TempData["Message"] = $"{student.FirstName} {student.LastName} başarıyla pasifleştirildi.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -288,6 +272,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
 
 
