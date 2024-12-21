@@ -18,8 +18,9 @@ namespace DormitoryManagementSystem.WEB.Controllers
         public IActionResult Index(string search)
         {
             var rooms = context.Rooms
+                .Where(r => !r.statusDeletedRoom)  // Soft delete işlemi
                 .Include(x => x.Dormitory)
-                .AsNoTracking()  // Performans için
+                .AsNoTracking()
                 .ToList();
 
             if (!string.IsNullOrEmpty(search))
@@ -27,13 +28,9 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 rooms = rooms.Where(r => r.Number.ToString().Contains(search)).ToList();
             }
 
-            if (rooms == null)
-            {
-                return View(new List<Room>());  // 
-            }
-
             return View(rooms);
         }
+
         public IActionResult Create()
         {
             ViewBag.Dormitories = new SelectList(context.Dormitories, "DormitoryID", "DormitoryName");
@@ -69,13 +66,12 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View(room);
         }
 
-        // Silme işlemi onaylandıktan sonra oda silme
         [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var room = await context.Rooms
-                .Include(x => x.Dormitory)
+                .Include(r => r.Students)
                 .FirstOrDefaultAsync(r => r.RoomID == id);
 
             if (room == null)
@@ -83,12 +79,18 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return NotFound();
             }
 
-            // Odayı sil
-            context.Rooms.Remove(room);
-            await context.SaveChangesAsync();
+            // Odayı ve öğrencilerini soft delete yap
+            room.statusDeletedRoom = false; // Odayı silindi olarak işaretle
+            foreach (var student in room.Students)
+            {
+                student.statusDeletedStudent = false; // Öğrencileri de silindi olarak işaretle
+            }
 
+            await context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+
 
     }
 }

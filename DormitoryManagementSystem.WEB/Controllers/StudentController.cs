@@ -20,6 +20,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             var query = _context.Students
                 .Include(x => x.Room)
                 .ThenInclude(y => y.Dormitory)
+                .Where(s => !s.statusDeletedStudent) // Soft delete olmayanları getir
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -33,6 +34,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             var students = await query.ToListAsync();
             return View(students);
         }
+
 
         public async Task<IActionResult> Create()
         {
@@ -251,12 +253,42 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return NotFound();
             }
 
-            // Öğrenciyi sil
-            _context.Students.Remove(student);
-            await _context.SaveChangesAsync();
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Öğrenciyi soft delete yap
+                    student.statusDeletedStudent = true;
+                    student.UpdatedAt = DateTime.Now;
+
+                    // Oda ve yurt kapasitesini güncelle
+                    if (student.Room != null)
+                    {
+                        student.Room.CurrentCapacity--;
+                        student.Room.CurrentStudentNumber--;
+                        if (student.Room.Dormitory != null)
+                        {
+                            student.Room.Dormitory.DormitoryCurrentCapacity--;
+                        }
+                    }
+
+                    // Veritabanını güncelle
+                    _context.Students.Update(student);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    ModelState.AddModelError("", "Silme işlemi sırasında bir hata oluştu: " + ex.Message);
+                }
+            }
 
             return RedirectToAction(nameof(Index));
         }
+
 
 
         public async Task<IActionResult> Details(Guid id)
