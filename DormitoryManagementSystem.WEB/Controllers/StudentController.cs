@@ -14,6 +14,38 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             _context = context;
         }
+        private List<string> GetImagesList()
+        {
+            try
+            {
+                var webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                var imagesPath = Path.Combine(webRootPath, "images");
+
+                // Klasör var mı kontrol et
+                if (!Directory.Exists(imagesPath))
+                {
+                    return new List<string>();
+                }
+
+                var directory = new DirectoryInfo(imagesPath);
+                if (!directory.Exists)
+                {
+                    return new List<string>();
+                }
+
+                var imageFiles = directory.GetFiles()
+                                        .Where(f => f.Extension.ToLower() is ".jpg" or ".jpeg" or ".png" or ".gif")
+                                        .Select(f => $"/images/{f.Name}")
+                                        .ToList();
+
+                return imageFiles;
+            }
+            catch (Exception ex)
+            {
+                // Hata loglanabilir
+                return new List<string>();
+            }
+        }
 
         [HttpGet("Student/GetAvailableRooms/{dormitoryId}")]
         public async Task<JsonResult> GetAvailableRooms([FromRoute] Guid dormitoryId)
@@ -63,6 +95,14 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
         public async Task<IActionResult> Create()
         {
+            var imagesList = GetImagesList();
+            if (imagesList == null)
+            {
+                imagesList = new List<string>(); // Null ise boş liste oluştur
+            }
+
+            // ViewBag'e atamaları yapalım
+            ViewBag.Images = imagesList;
             ViewBag.Dormitories = await _context.Dormitories.ToListAsync();
             return View();
         }

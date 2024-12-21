@@ -12,6 +12,27 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             context = _context;
         }
+
+        private List<string> GetImagesList()
+        {
+            try
+            {
+                var webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                var imagesPath = Path.Combine(webRootPath, "images");
+
+                // Directory.GetFiles yerine DirectoryInfo kullanarak dosyaları alalım
+                var directory = new DirectoryInfo(imagesPath);
+                var imageFiles = directory.GetFiles()
+                                        .Select(f => $"/images/{f.Name}")
+                                        .ToList();
+                return imageFiles;
+            }
+            catch (Exception)
+            {
+                // Hata durumunda boş liste dön
+                return new List<string>();
+            }
+        }
         public IActionResult Index()
         {
             IEnumerable<Dormitory> dormitories = context.Dormitories
@@ -25,6 +46,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
         public IActionResult Create()
         {
+            ViewBag.Images = GetImagesList();
+
             return View();
         }
 
@@ -122,9 +145,9 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return NotFound();
             }
 
+            ViewBag.Images = GetImagesList();
             return View(dormitory);
         }
-
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, Dormitory dormitory)
         {

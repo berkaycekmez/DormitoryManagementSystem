@@ -22,9 +22,18 @@
                 <input asp-for="Phone" class="form-control" />
                 <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="PhotoUrl">Fotoğraf URL</label>
-                <input asp-for="PhotoUrl" class="form-control" />
+            <div class="form-group mb-3">
+                <label asp-for="PhotoUrl" class="control-label">Fotoğraf</label>
+                <select asp-for="PhotoUrl" class="form-control">
+                    <option value="">Fotoğraf Seçin</option>
+                    @if (ViewBag.Images != null && ViewBag.Images.Count > 0)
+                    {
+                        @foreach (var image in ViewBag.Images)
+                        {
+                            <option value="@image">@image.Replace("/images/", "")</option>
+                        }
+                    }
+                </select>
                 <span asp-validation-for="PhotoUrl" class="text-danger"></span>
             </div>
             <div class="form-group">

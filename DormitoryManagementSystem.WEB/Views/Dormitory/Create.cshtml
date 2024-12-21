@@ -39,8 +39,14 @@
 
 
                     <div class="form-group mb-3">
-                        <label asp-for="DormitoryPhotoUrl" class="control-label">Fotoğraf URL</label>
-                        <input asp-for="DormitoryPhotoUrl" class="form-control" required />
+                        <label asp-for="DormitoryPhotoUrl" class="control-label">Fotoğraf</label>
+                        <select asp-for="DormitoryPhotoUrl" class="form-control">
+                            <option value="">Fotoğraf Seçin</option>
+                            @foreach (var image in ViewBag.Images)
+                            {
+                                <option value="@image">@image.Replace("/images/", "")</option>
+                            }
+                        </select>
                         <span asp-validation-for="DormitoryPhotoUrl" class="text-danger"></span>
                     </div>
                 </div>
