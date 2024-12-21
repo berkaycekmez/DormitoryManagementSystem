@@ -15,11 +15,11 @@ namespace DormitoryManagementSystem.MODEL
             Students = new List<Student>();
         }
         public Guid DormitoryID { get; set; }
-        public string DormitoryName { get; set; }
-        public string DormitoryPhotoUrl { get; set; }
-        public string Address { get; set; }
+        public string? DormitoryName { get; set; }
+        public string? DormitoryPhotoUrl { get; set; }
+        public string? Address { get; set; }
         [RegularExpression(@"^(\+90|0)?5\d{9}$", ErrorMessage = "Lütfen geçerli bir telefon numarası giriniz.")]
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
         public int DormitoryCapacity { get; set; }
         public int DormitoryCurrentCapacity { get; set; }
         public double OccupancyRate { get; set; }
