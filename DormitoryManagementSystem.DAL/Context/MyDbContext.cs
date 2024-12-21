@@ -8,12 +8,14 @@ using System.Reflection.Metadata;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using DormitoryManagementSystem.MODEL.User;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace DormitoryManagementSystem.DAL.Context
 {
-    public class MyDbContext:DbContext
+    public class MyDbContext: IdentityDbContext<ApplicationUser>
     {
-        public MyDbContext(DbContextOptions options) : base(options)
+        public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {
         }
 
@@ -25,6 +27,5 @@ namespace DormitoryManagementSystem.DAL.Context
         public DbSet<Dormitory> Dormitories { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Student> Students { get; set; }
-        public DbSet<User> Users { get; set; }
     }
 }

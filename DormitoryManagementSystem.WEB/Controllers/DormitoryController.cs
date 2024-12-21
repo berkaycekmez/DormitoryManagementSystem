@@ -1,10 +1,13 @@
 ﻿using DormitoryManagementSystem.DAL.Context;
 using DormitoryManagementSystem.MODEL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DormitoryManagementSystem.WEB.Controllers
 {
+    [Authorize]
+
     public class DormitoryController : Controller
     {
         MyDbContext context;
@@ -12,7 +15,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             context = _context;
         }
-
+        
         private List<string> GetImagesList()
         {
             try
@@ -43,14 +46,14 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View(dormitories);
         }
 
-
+        [Authorize(Roles = "Admin")] 
         public IActionResult Create()
         {
             ViewBag.Images = GetImagesList();
 
             return View();
         }
-
+        [Authorize(Roles = "Admin")] 
         [HttpPost]
         public async Task<IActionResult> Create(Dormitory dormitory,int RoomCount)
         {
@@ -87,6 +90,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return View(dormitory);
         }
+
+        [Authorize(Roles = "Admin")] 
         [HttpGet]
         public IActionResult Delete(Guid id)
         {
@@ -101,7 +106,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return View(dormitory);
         }
-
+        [Authorize(Roles = "Admin")] 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
@@ -131,7 +136,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return RedirectToAction("Index");
         }
 
-
+        [Authorize(Roles = "Admin")] 
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
@@ -148,6 +153,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
             ViewBag.Images = GetImagesList();
             return View(dormitory);
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, Dormitory dormitory)
         {

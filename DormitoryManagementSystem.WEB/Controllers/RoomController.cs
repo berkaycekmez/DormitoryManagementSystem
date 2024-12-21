@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DormitoryManagementSystem.WEB.Controllers
 {
+    [Authorize]
+
     public class RoomController : Controller
     {
         MyDbContext context;
@@ -14,6 +16,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
         {
             context = _context;
         }
+        
 
         public IActionResult Index(string search)
         {
@@ -30,13 +33,13 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return View(rooms);
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewBag.Dormitories = new SelectList(context.Dormitories, "DormitoryID", "DormitoryName");
             return View();
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(Room room, Guid DormitoryID)
         {
@@ -52,6 +55,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             }
             return View(room);
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(Guid id)
         {
             var room = context.Rooms
@@ -68,6 +72,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
         [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var room = await context.Rooms
@@ -91,7 +96,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
         }
 
 
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid id)
         {
             var room = await context.Rooms
@@ -112,6 +117,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid id, Room room)
         {
             if (id != room.RoomID)

@@ -3,8 +3,6 @@ using DormitoryManagementSystem.MODEL;
 using DormitoryManagementSystem.WEB.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using Mscc.GenerativeAI;
 using System.Diagnostics;
 
 namespace DormitoryManagementSystem.WEB.Controllers
@@ -12,13 +10,17 @@ namespace DormitoryManagementSystem.WEB.Controllers
     public class HomeController : Controller
     {
         public MyDbContext context;
-        private readonly GoogleAI _googleAI;
 
-        public HomeController(MyDbContext _context, GoogleAI googleAI)
+        // GoogleAI servisini þimdilik kaldýrýyoruz çünkü Identity sistemini kurmak önceliðimiz
+        // private readonly GoogleAI _googleAI;
+
+        // Constructor'ý güncelliyoruz
+        public HomeController(MyDbContext _context/*, GoogleAI googleAI*/)
         {
             context = _context;
-            _googleAI = googleAI;
+            //_googleAI = googleAI;
         }
+
         public IActionResult Index()
         {
             IEnumerable<Dormitory> dormitories = new List<Dormitory>();
@@ -26,7 +28,8 @@ namespace DormitoryManagementSystem.WEB.Controllers
             return View(dormitories);
         }
 
-
+        // AI chat fonksiyonunu þimdilik yoruma alýyoruz
+        /*
         [HttpPost]
         public async Task<IActionResult> Index([FromForm] MessageRequest request)
         {
@@ -48,31 +51,21 @@ namespace DormitoryManagementSystem.WEB.Controllers
             string studentInfo = string.Join("; ", students.Select(s =>
                 $"Öðrenci Ýsmi: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
 
-            request.UserMessage += $": NOT! Sen bir yapay zeka asistanýsýn ve yalnýzca veritabanýndaki verilere dayanarak cevap vermekle yükümlüsün. Ancak, verilen sorularý tekrar etme; direkt cevap ver. Þimdi sana veritabanýndaki verileri veriyorum. Bilgileri dikkate alarak sorularý yanýtla: " +
-    $"Yurt bilgileri: {dormitoryInfo}. " +
-    $"Yurtlarýn odalarý hakkýndaki bilgiler: {roomInfo}. " +
-    $"Ve son olarak yurtlarýn odalarýnda kalan öðrencilerin bilgileri: {studentInfo}. " +
-    $"Kullanýcýlarýn istediði bilgilere bu verilerden ulaþabiliyorsan düzgün bir þekilde açýklayarak anlat"+
-    $"ÖNCELÝKLE UNUTMA, SENÝN BÝRÝNCÝ VAZÝFEN UPDATE VEYA DELETE ÝÞLEMÝ YOKSA, HÝÇBÝR VERÝNÝN ID'SÝNÝ KÝMLÝÐÝNÝ RESPONSE OLARAK VERME. " +
-    $"AYRICA ASLA NULL RESPONSE DÖNME; HEP BÝR CEVABIN OLSUN, EN KÖTÜ BÝLMÝYORSAN DA \"Bilmiyorum\" de. " +
-    $"Eðer ki kullanýcý senden delete - silme iþlemi isterse, örneðin 'Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öðrenciyi sil' 'Ömer isimli öðrenciyi sil' derse veya '1. kat 1. odayý sil' derse ya da 'þu isimli yurdu sil' derse, lütfen önce veritabanýndaki verilere bak ve eþleþen veri olup olmadýðýný kontrol et. " +
-    $"Eðer eþleþen veri yoksa, \"Silmek istediðiniz veri sistemde bulunmamaktadýr.\" þeklinde yanýt ver. " +
-    $"Eðer silmek istediði þey verdiðim verilerde mevcut ise idsini response olarak dön ama response da sadece id si yazsýn";
-
+            // AI prompt ve iþlemleri...
+            
             var model = _googleAI.GenerativeModel(Model.GeminiPro);
             var response = await model.GenerateContent(request.UserMessage);
 
             string responseText = FormatResponse(response.Text);
 
-
             if (!Guid.TryParse(response.Text, out Guid id))
             {
                 return Json(new { response = responseText });
             }
+
             var studentIds = students.Select(s => s.StudentId).ToList();
             var roomIds = rooms.Select(r => r.RoomID).ToList();
             var dormitoryIds = dormitories.Select(d => d.DormitoryID).ToList();
-
 
             if (studentIds.Contains(id))
             {
@@ -100,6 +93,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return Json(new { response = "Geçersiz ID: Bu ID sistemde bulunmamaktadýr." });
             }
         }
+
         private string FormatResponse(string? responseText)
         {
             var formattedText = responseText
@@ -111,9 +105,14 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             return formattedText;
         }
+        */
     }
+
+    // Bu sýnýfý þimdilik yoruma alabiliriz çünkü AI özelliðini geçici olarak kaldýrdýk
+    /*
     public class MessageRequest
     {
         public string UserMessage { get; set; }
     }
+    */
 }
