@@ -1,10 +1,16 @@
 using DormitoryManagementSystem.DAL.Context;
 using Microsoft.EntityFrameworkCore;
+using Mscc.GenerativeAI;
 
 var builder = WebApplication.CreateBuilder(args);
+var apiKey = "AIzaSyB7jaLJB5nipqk0-gQ2wIlr7u9Vi881a4s";
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<GoogleAI>(new GoogleAI(apiKey));
+
 
 builder.Services.AddDbContext<MyDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("Mysql"), b => b.MigrationsAssembly("DormitoryManagementSystem.WEB")));
 
