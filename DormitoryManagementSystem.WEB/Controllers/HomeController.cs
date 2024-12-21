@@ -21,12 +21,23 @@ namespace DormitoryManagementSystem.WEB.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<Dormitory> dormitories = new List<Dormitory>();
-            dormitories = context.Dormitories.Where(x => x.statusDeletedDormitory == false).ToList();
-            foreach (var item in dormitories)
+            IEnumerable<Dormitory> dormitories = context.Dormitories
+                .Where(x => x.statusDeletedDormitory == false)
+                .ToList();
+
+            foreach (var dormitory in dormitories)
             {
-                item.OccupancyRate = item.DormitoryCurrentCapacity * 100 / item.DormitoryCapacity;
+                // Sıfıra bölünmeyi önle
+                if (dormitory.DormitoryCapacity > 0)
+                {
+                    dormitory.OccupancyRate = dormitory.DormitoryCurrentCapacity * 100 / dormitory.DormitoryCapacity;
+                }
+                else
+                {
+                    dormitory.OccupancyRate = 0;
+                }
             }
+
             return View(dormitories);
         }
 
@@ -44,13 +55,13 @@ namespace DormitoryManagementSystem.WEB.Controllers
             var rooms = context.Rooms.Include(x => x.Dormitory).ToList();
 
             string dormitoryInfo = string.Join("; ", dormitories.Select(d =>
-                $"Yurt Ismi: {d.DormitoryName}, Adres: {d.Address}, Id: {d.DormitoryID}, Telefon: {d.Phone}, Kapasite: {d.DormitoryCapacity}, Mevcut Kapasite: {d.DormitoryCurrentCapacity}, Doluluk Oraný: {d.OccupancyRate}%"));
+                $"Yurt Ýsmi: {d.DormitoryName}, Adres: {d.Address}, Id: {d.DormitoryID}, Telefon: {d.Phone}, Kapasite: {d.DormitoryCapacity}, Mevcut Kapasite: {d.DormitoryCurrentCapacity}, Doluluk Oraný: {d.OccupancyRate}%"));
 
             string roomInfo = string.Join("; ", rooms.Select(r =>
                 $"Oda No: {r.Number}, Kat: {r.Floor}, Id: {r.RoomID}, Kapasite: {r.Capacity}, Mevcut Öðrenci Sayýsý: {r.CurrentStudentNumber}, Yurt: {r.Dormitory.DormitoryName}"));
 
             string studentInfo = string.Join("; ", students.Select(s =>
-                $"Öðrenci Ismi: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
+                $"Öðrenci Ýsmi: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
 
             request.UserMessage += $": NOT! Sen bir yapay zeka asistanısın ve yalnızca veritabanındaki verilere dayanarak cevap vermekle yükümlüsün. Ancak, verilen soruları tekrar etme; direkt cevap ver. Şimdi sana veritabanındaki verileri veriyorum. Bilgileri dikkate alarak soruları yanıtla: " +
 $"Yurt bilgileri: {dormitoryInfo}. " +
@@ -114,7 +125,7 @@ $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktad�
         private string FormatResponse(string? responseText)
         {
             var formattedText = responseText
-                .Replace("", "")
+                .Replace("**", "")
                 .Replace("\n", "")
                 .Replace("* ", "")
                 .Insert(0, "")

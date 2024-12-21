@@ -298,31 +298,34 @@
     <script>
         // Doluluk oranları grafiklerini oluştur
         @foreach (var dormitory in Model)
-        {
-            <text>
-                    new Chart(document.getElementById('chart-@dormitory.DormitoryID'), {
-                        type: 'doughnut',
-                    data: {
-                        labels: ['Dolu', 'Boş'],
-                    datasets: [{
-                        data: [@dormitory.OccupancyRate, @(100 - dormitory.OccupancyRate)],
+{
+    <text>
+        new Chart(document.getElementById('chart-@dormitory.DormitoryID'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Dolu', 'Boş'],
+                datasets: [{
+                    data: [
+                        @(dormitory.DormitoryCapacity > 0 ? Math.Round(dormitory.OccupancyRate, 2) : 0),
+                        @(dormitory.DormitoryCapacity > 0 ? Math.Round(100 - dormitory.OccupancyRate, 2) : 0)
+                    ],
                     backgroundColor: ['#4b6cb7', '#e9ecef'],
                     borderWidth: 0
-                                }]
-                            },
-                    options: {
-                        responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
                         display: false
-                                    }
-                                }
-                            }
-                        });
-            </text>
-        }
+                    }
+                }
+            }
+        });
+    </text>
+}
 
             // Chat fonksiyonları
             document.getElementById('chatForm').addEventListener('submit', async (e) => {
