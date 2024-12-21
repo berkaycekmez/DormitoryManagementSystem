@@ -86,7 +86,7 @@ $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktad�
                 student.statusDeletedStudent = true;
                 context.Update(student);
                 context.SaveChanges();
-                return Json(new { response = $"Ýstemiþ olduðunuz silme isteði baþarýyla gerçekleþtirilmiþtir." });
+                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
             }
             else if (roomIds.Contains(id))
             {
@@ -94,7 +94,7 @@ $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktad�
                 room.statusDeletedRoom = true;
                 context.Update(room);
                 context.SaveChanges();
-                return Json(new { response = $"Ýstemiþ olduðunuz silme isteði baþarýyla gerçekleþtirilmiþtir." });
+                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
             }
             else if (dormitoryIds.Contains(id))
             {
@@ -102,7 +102,7 @@ $"Eğer eşleşen veri yoksa, \"Silmek istediğiniz veri sistemde bulunmamaktad�
                 dormitory.statusDeletedDormitory = true;
                 context.Update(dormitory);
                 context.SaveChanges();
-                return Json(new { response = $"Ýstemiþ olduðunuz silme isteði baþarýyla gerçekleþtirilmiþtir." });
+                return Json(new { response = $"İstemiş olduğunuz silme işlemi başarıyla gerçekleştirilmiştir." });
             }
             else
             {
