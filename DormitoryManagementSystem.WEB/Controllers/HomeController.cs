@@ -48,15 +48,17 @@ namespace DormitoryManagementSystem.WEB.Controllers
             string studentInfo = string.Join("; ", students.Select(s =>
                 $"Öðrenci Adý: {s.FirstName} {s.LastName}, Id: {s.StudentId}, Telefon: {s.Phone}, Oda No: {s.Room.Number}, Yurt: {s.Room.Dormitory.DormitoryName}"));
 
-            request.UserMessage += $": NOT! Sen bir yapay zeka asistanýsýn ve yalnýzca veritabanýndaki verilere dayanarak cevap vermekle yükümlüsün. Þimdi sana veritabanýndaki verileri veriyorum. Bilgileri dikkate alarak sorularý yanýtla: " +
-                $"Yurt bilgileri: {dormitoryInfo}. " +
-                $"Yurtlarýn odalarý hakkýndaki bilgiler: {roomInfo}. " +
-                $"Ve son olarak yurtlarýn odalarýnda kalan öðrencilerin bilgileri: {studentInfo}. " +
-                $"ÖNCELÝKLE UNUTMA SENÝN BÝRÝNCÝ VAZÝFEN UPDATE VEYA DELETE ÝÞLEMÝ YOKSA SAKIN HÝÇBÝR VERÝNÝN IDSÝNÝ KÝMLÝÐÝNÝ RESPONSE OLARAK VERME"+
-                $"Eðer ki sana spesifik olarak bir yurtla, odayla veya öðrenciyle ilgili bir soru sorulursa bu verileri tara ve cevaplarý açýk bir þekilde ver. " +
-                $"Eðer ki sana sorulan soru veritabanýndaki bilgilerden alakasýz ise, yalnýzca yurtlar, odalar ve öðrenciler ile ilgili bilgiler hakkýnda konuþabileceðini söyle. " +
-                $"Eðer gelen soru çok genel veya tanýdýk bir selamlaþma gibi ise, kibarca \"Bu konuda yardýmcý olamam; yalnýzca sistemdeki yurtlar, odalar ve öðrencilerle ilgili sorularý yanýtlayabilirim.\" þeklinde yanýt ver." +
-                $"Bir de senden son bir isteðim var; eðer ki kullanýcý senden delete veya update iþlemi isterse mesela Ýsmi Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öðrenciyi sil derse veya Muhammed Fatih Safitürk yurdundaki 1. kat 1. odayý sil derse ya da direkt þu isimli yurdu sil derse bana cevap olarak iþlem yapýlacak öðenin türü, iþlemin türü ve silinecek öðenin id'sini ver ama sadece update veya delete iþlemi varsa id vereceksin diðer durumlarda idyi response verme mesela þu studnetin bilgilerini ver veya room dormitory fark etmez o durumlarda id hariç diðer bilgileri response ver. Örnek veriyorum silme iþlemiyse cevabý þu formatta ver 'Student - Update - (silinecek öðenin idsi)' zaten verebileceðin formatlar belli neyi silmek istediðini anla Student Room ya da Dormitory olabilir sonrasýnda Update mi Delete mi sonrasýnda da id yi ver parantez içinde, unutma id parantez içinde olucak response de þu þekilde 'Student - Update - (silinecek öðenin idsi)'.";
+            request.UserMessage += $": NOT! Sen bir yapay zeka asistanýsýn ve yalnýzca veritabanýndaki verilere dayanarak cevap vermekle yükümlüsün. Ancak, verilen sorularý tekrar etme; direkt cevap ver. Þimdi sana veritabanýndaki verileri veriyorum. Bilgileri dikkate alarak sorularý yanýtla: " +
+    $"Yurt bilgileri: {dormitoryInfo}. " +
+    $"Yurtlarýn odalarý hakkýndaki bilgiler: {roomInfo}. " +
+    $"Ve son olarak yurtlarýn odalarýnda kalan öðrencilerin bilgileri: {studentInfo}. " +
+    $"ÖNCELÝKLE UNUTMA, SENÝN BÝRÝNCÝ VAZÝFEN UPDATE VEYA DELETE ÝÞLEMÝ YOKSA, HÝÇBÝR VERÝNÝN ID'SÝNÝ KÝMLÝÐÝNÝ RESPONSE OLARAK VERME. " +
+    $"AYRICA ASLA SORULARI CEVAPSIZ BIRAKMA; HEP BÝR CEVABIN OLSUN, EN KÖTÜ BÝLMÝYORSAN DA \"Bilmiyorum\" de. " +
+    $"Eðer ki sana spesifik olarak bir yurtla, odayla veya öðrenciyle ilgili bir soru sorulursa, bu verileri tara ve en uygun þekilde yanýtla. " +
+    $"Eðer ki sana sorulan soru veritabanýndaki bilgilerden alakasýzsa veya yurt, oda ve öðrenci ile ilgili deðilse, yalnýzca yurtlar, odalar ve öðrenciler hakkýnda konuþabileceðini belirt. " +
+    $"Eðer gelen soru çok genel veya tanýdýk bir selamlaþma gibi ise, kibarca \"Bu konuda yardýmcý olamam; yalnýzca sistemdeki yurtlar, odalar ve öðrencilerle ilgili sorularý yanýtlayabilirim.\" þeklinde yanýt ver. " +
+    $"Eðer kullanýcý senden delete veya update iþlemi isterse, örneðin 'Berkay Çekmez olan Muhammed Fatih Safitürk yurdundaki öðrenciyi sil' derse veya '1. kat 1. odayý sil' derse ya da 'þu isimli yurdu sil' derse, iþlem yapýlacak öðenin türü, iþlemin türü ve silinecek öðenin ID'sini parantez içinde döndür. Örneðin: \"Student - Update - (silinecek öðenin idsi)\". Neyi silmek istediðini anla (Student, Room ya da Dormitory olabilir), sonrasýnda Update mi Delete mi olduðunu belirle ve ardýndan ID'yi parantez içinde ver. Unutma, ID parantez içinde olacak ve response þu þekilde olmalý: \"Student - Update - (silinecek öðenin idsi)\". Öðrenci bilgisi döndürme; sadece Student, Room veya Dormitory bilgilerini döndür. Update veya Delete ile ilgili veri dönerken ID'yi parantez içinde vermeyi unutma. eðer silmek istediði þey bir öðrenci ise \"Student - Delete - (silinecek öðenin idsi)\" tarzýnda dön eðer silmek isteði yurt ise \"Dormitory - Update - (silinecek öðenin idsi)\" eðer bir oda ise \"Room - Update - (silinecek öðenin idsi)\" þeklinde";
+
 
             var model = _googleAI.GenerativeModel(Model.GeminiPro);
             var response = await model.GenerateContent(request.UserMessage);
