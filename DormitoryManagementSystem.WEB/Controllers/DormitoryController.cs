@@ -18,6 +18,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
             dormitories = context.Dormitories.Include(y => y.Rooms).ToList();
             return View(dormitories);
         }
+
         public IActionResult Create()
         {
             return View();
@@ -57,6 +58,85 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return RedirectToAction("Index");
             }
 
+            return View(dormitory);
+        }
+        [HttpGet]
+        public IActionResult Delete(Guid id)
+        {
+            // Silinecek yurdu veritabanından getir  
+            var dormitory = context.Dormitories.Include(d => d.Rooms).FirstOrDefault(d => d.DormitoryID == id);
+
+            if (dormitory == null)
+            {
+                return NotFound();
+            }
+
+            return View(dormitory); // Silme onayı için bir View gösterilebilir  
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        {
+            // Silinecek yurdu ve ilişkili odaları veritabanından getir  
+            var dormitory = context.Dormitories.Include(d => d.Rooms).FirstOrDefault(d => d.DormitoryID == id);
+
+            if (dormitory != null)
+            {
+                // İlgili odaları sil  
+                context.Rooms.RemoveRange(dormitory.Rooms);
+
+                // Yurdu sil  
+                context.Dormitories.Remove(dormitory);
+
+                // Değişiklikleri kaydet  
+                await context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var dormitory = await context.Dormitories
+                .Include(d => d.Rooms)
+                .FirstOrDefaultAsync(d => d.DormitoryID == id);
+
+            if (dormitory == null)
+            {
+                return NotFound();
+            }
+
+            return View(dormitory);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Guid id, Dormitory dormitory)
+        {
+            if (id != dormitory.DormitoryID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    context.Update(dormitory);
+                    await context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!context.Dormitories.Any(d => d.DormitoryID == id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
             return View(dormitory);
         }
     }
