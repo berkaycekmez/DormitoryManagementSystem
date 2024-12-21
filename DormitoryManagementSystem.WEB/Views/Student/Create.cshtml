@@ -67,16 +67,14 @@
     </div>
 </div>
 
-<!-- jQuery'yi yükleyin -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     $(document).ready(function () {
         $('#dormitorySelect').change(function () {
             var dormitoryId = $(this).val();
-            console.log("Seçilen yurt ID:", dormitoryId); // Değeri konsolda kontrol edin
+            console.log("Seçilen yurt ID:", dormitoryId); 
 
-            // Eğer boşsa veya geçersizse bir hata mesajı göster
             if (!dormitoryId || dormitoryId === '00000000-0000-0000-0000-000000000000') {
                 alert("Geçerli bir yurt seçmelisiniz.");
                 return;
@@ -98,7 +96,7 @@
                                     .attr('value', room.roomID)
                                     .text(`Oda ${room.number} (${room.currentCapacity}/${room.capacity})`));
                             });
-                            roomSelect.prop('disabled', false); // Oda seçim alanını etkinleştir
+                            roomSelect.prop('disabled', false); 
                         } else {
                             roomSelect.append('<option value="">Bu yurtta uygun oda bulunmamaktadır</option>');
                         }
@@ -111,7 +109,7 @@
                     }
                 });
             } else {
-                roomSelect.prop('disabled', true); // Yurt seçilmediyse oda seçim alanını devre dışı bırak
+                roomSelect.prop('disabled', true);
                 roomSelect.append('<option value="">-- Önce Yurt Seçin --</option>');
             }
         });

@@ -21,7 +21,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
         public IActionResult Index(string search)
         {
             var rooms = context.Rooms
-                .Where(r => !r.statusDeletedRoom)  // Soft delete işlemi
+                .Where(r => !r.statusDeletedRoom)  
                 .Include(x => x.Dormitory)
                 .AsNoTracking()
                 .ToList();
@@ -36,7 +36,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            // Yalnızca silinmemiş yurtları getir
             ViewBag.Dormitories = new SelectList(
                 context.Dormitories.Where(d => !d.statusDeletedDormitory),
                 "DormitoryID",
@@ -53,26 +52,25 @@ namespace DormitoryManagementSystem.WEB.Controllers
             if (!ModelState.IsValid)
             {
                 room.RoomID = Guid.NewGuid();
-                room.CurrentCapacity = 0;  // Oda başlangıç kapasitesi
+                room.CurrentCapacity = 0;  
                 room.DormitoryID = DormitoryID;
 
-                // Yurt bilgisini al ve kapasiteyi artır
                 var dormitory = await context.Dormitories
                     .FirstOrDefaultAsync(d => d.DormitoryID == DormitoryID);
 
                 if (dormitory != null)
                 {
-                    dormitory.DormitoryCapacity += room.Capacity; // Yeni odayla kapasiteyi artır
-                    context.Dormitories.Update(dormitory); // Yurt verisini güncelle
+                    dormitory.DormitoryCapacity += room.Capacity; 
+                    context.Dormitories.Update(dormitory);
                 }
 
-                context.Rooms.Add(room); // Odayı ekle
-                await context.SaveChangesAsync(); // Değişiklikleri kaydet
+                context.Rooms.Add(room); 
+                await context.SaveChangesAsync(); 
 
                 return RedirectToAction(nameof(Index));
             }
 
-            // Eğer model geçerli değilse
+            
             ViewBag.Dormitories = new SelectList(
                 context.Dormitories.Where(d => !d.statusDeletedDormitory),
                 "DormitoryID",
@@ -112,14 +110,14 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return NotFound();
             }
 
-            // Odayı ve öğrencilerini soft delete yap
-            room.statusDeletedRoom = true; // Odayı silindi olarak işaretle
+            
+            room.statusDeletedRoom = true; 
             foreach (var student in room.Students)
             {
-                student.statusDeletedStudent = true; // Öğrencileri de silindi olarak işaretle
+                student.statusDeletedStudent = true; 
             }
 
-            await context.SaveChangesAsync(); // Değişiklikleri veritabanına kaydet
+            await context.SaveChangesAsync(); 
             return RedirectToAction(nameof(Index));
         }
 
@@ -163,7 +161,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
                 return NotFound();
             }
 
-            // Kapasite kontrolü
             if (room.Capacity < existingRoom.CurrentCapacity)
             {
                 ModelState.AddModelError("Capacity",
@@ -175,11 +172,11 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
             try
             {
-                // Mevcut değerleri koru
+                
                 room.CurrentCapacity = existingRoom.CurrentCapacity;
                 room.CurrentStudentNumber = existingRoom.CurrentStudentNumber;
 
-                // Yurt değişikliği varsa kontrol et
+               
                 if (existingRoom.DormitoryID != room.DormitoryID)
                 {
                     var newDormitory = await context.Dormitories
@@ -194,7 +191,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
                     }
                 }
 
-                // Yurdun kapasitesini artır
+               
                 if (existingRoom.Capacity != room.Capacity)
                 {
                     var dormitory = await context.Dormitories
@@ -202,7 +199,7 @@ namespace DormitoryManagementSystem.WEB.Controllers
 
                     if (dormitory != null)
                     {
-                        dormitory.DormitoryCapacity += room.Capacity - existingRoom.Capacity; // Kapasite farkını ekle
+                        dormitory.DormitoryCapacity += room.Capacity - existingRoom.Capacity; 
                         context.Dormitories.Update(dormitory);
                     }
                 }

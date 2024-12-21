@@ -363,11 +363,9 @@ namespace DormitoryManagementSystem.WEB.Controllers
             {
                 try
                 {
-                    // Öğrenciyi soft delete yap
                     student.statusDeletedStudent = true;
                     student.UpdatedAt = DateTime.Now;
 
-                    // Oda ve yurt kapasitesini güncelle
                     if (student.Room != null)
                     {
                         student.Room.CurrentCapacity--;
@@ -378,7 +376,6 @@ namespace DormitoryManagementSystem.WEB.Controllers
                         }
                     }
 
-                    // Veritabanını güncelle
                     _context.Students.Update(student);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
